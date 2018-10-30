@@ -5,9 +5,9 @@ Lx = 1;
 Ly = 1;
 Lz = .4;
 
-Nex = 40;
-Ney = 40;
-Nez = 18;
+Nex = 10;
+Ney = 10;
+Nez = 6;
 
 NPE = 8;
 
@@ -73,11 +73,11 @@ M=M+uns;
 
 
 clear Ke Me Kelem Melem Elements X Y 
-
+return
 %%
 opts.spdB= 1;
 opts.tol = 1e-12;
-[V,L]=eigs(-K,M,40,'sm',opts);
+[V,L]=eigs(-K,M,20,'sm',opts);
 V = real(V);
 l = diag(L);
 feig = real(sqrt(-l)/2/pi);
@@ -111,3 +111,7 @@ show_mesh(ELEM(BCelem,:),coord);
 [n,areas ] = getsurfacenormals(ELEM(BCelem,:),XYZ);
 
 % TO-DO add surface integral of FSI surfaces
+S = XYZ(ELEM(BCelem(1),:),:);
+S = S(5:8,:)
+[Fout] = SurfaceInt (S,n(1,3)*1/areas(1))
+
