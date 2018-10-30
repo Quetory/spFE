@@ -5,9 +5,9 @@ Lx = 1;
 Ly = 1;
 Lz = .25;
 
-Nex = 4;
-Ney = 4;
-Nez = 4;
+Nex = 40;
+Ney = 40;
+Nez = 12;
 
 NPE = 8;
 
