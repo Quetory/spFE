@@ -1,6 +1,6 @@
 function animate_mode(elements,coordinates, shape,NDOF)
 Nperiods = 2;
-freq = 0.05;
+freq = 0.025;
 if size(coordinates,2)==2    %2D objects 
     if size(elements,2)==3   %triangle         
         X=reshape(coordinates(elements',1),size(elements,2),size(elements,1));
