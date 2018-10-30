@@ -1,6 +1,6 @@
 function animate_mode(elements,coordinates, shape,NDOF)
 Nperiods = 2;
-freq = 0.01;
+freq = 0.05;
 if size(coordinates,2)==2    %2D objects 
     if size(elements,2)==3   %triangle         
         X=reshape(coordinates(elements',1),size(elements,2),size(elements,1));
@@ -59,18 +59,12 @@ elseif size(coordinates,2)==3   %3D object
             view(3)
            
             for t = 1: ceil(Nperiods/freq)
-               tic
                mode = vanim*sin(2*pi*freq*t);
-
                P = reshape(mode(faces'),size(faces,2),size(faces,1));
        
                h.CData=P;
-               tdraw = toc;
-               if (1/tdraw<24)
-                   drawnow;
-               else
-                   pause(1/24-tdraw)
-               end
+               drawnow
+
             end
            
        end

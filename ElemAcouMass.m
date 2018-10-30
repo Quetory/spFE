@@ -39,4 +39,4 @@ for IN = 1:numel(IP.WT)
     
     Melem = Melem + WT*(N.')*(N)*dJ;
 end
-Melem = 1/c^2*Melem;
+Melem = rho*Melem;

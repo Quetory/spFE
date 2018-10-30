@@ -3,11 +3,11 @@ clc
 %%
 Lx = 1;
 Ly = 1;
-Lz = .25;
+Lz = .4;
 
 Nex = 40;
 Ney = 40;
-Nez = 12;
+Nez = 18;
 
 NPE = 8;
 
@@ -39,6 +39,7 @@ idx = arrayfun(@(i) find(sum(bsxfun(@minus,coord,center(i,:)).^2,2)<=E_r2*1.001)
 ELEM = cell2mat(idx).' ;
 ELEM = ELEM(:,[1 3 4 2 5 7 8 6]);
 
+figure(1)
 show_mesh(ELEM,coord);
 
 clear center
@@ -49,7 +50,7 @@ rho = 1.184;
 c = 346.13;
 XYZ = coord(ELEM(1,:),:);
 [Melem] = ElemAcouMass(XYZ,rho,c);
-[Kelem] = ElemAcouStiffness(XYZ,rho);
+[Kelem] = ElemAcouStiffness(XYZ,rho,c);
 NDOF = 1;
 
 
@@ -76,7 +77,7 @@ clear Ke Me Kelem Melem Elements X Y
 %%
 opts.spdB= 1;
 opts.tol = 1e-12;
-[V,L]=eigs(-K,M,20,'sm',opts);
+[V,L]=eigs(-K,M,40,'sm',opts);
 V = real(V);
 l = diag(L);
 feig = real(sqrt(-l)/2/pi);
@@ -86,9 +87,8 @@ feig = real(sqrt(-l)/2/pi);
 disp([c/2/Lz feig(idx)])
 
 %%
-% close all
-% animate_mode(ELEM,coord,V(:,idx),1);
-
+animate_mode(ELEM,coord,V(:,idx),1);
+return
 %%
 
 BCnodes = find(coord(:,3)==Lz);

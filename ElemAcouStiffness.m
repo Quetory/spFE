@@ -1,4 +1,4 @@
-function [Kelem,dJ] = ElemAcouStiffness(XYZ, rho)
+function [Kelem,dJ] = ElemAcouStiffness(XYZ, rho,c)
 
 NPE = size(XYZ,1);
 
@@ -42,4 +42,4 @@ for IN = 1:numel(IP.WT)
     Kelem = Kelem + WT*(DNj.')*DNj*dJ;
 end
 
-% Kelem = 1/rho*Kelem;
+Kelem = rho*c^2*Kelem;
