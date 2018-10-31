@@ -6,7 +6,7 @@ if NPE==8
     J0 = DN*XYZ;
     J0i = (eye(3)/J0) ;
     dJ0 = det(J0);
-    T = J0i;
+    T = J0i.';
 
     T11 = (T.*T).';
     
