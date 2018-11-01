@@ -27,7 +27,7 @@ elseif size(coordinates,2)==3   %3D object
        Y=reshape(coordinates(faces',2),size(faces,2),size(faces,1)); 
        Z=reshape(coordinates(faces',3),size(faces,2),size(faces,1)); 
        
-       patch(X,Y,Z,[0.3 0.3 0.9]);    
+       patch(X,Y,Z,[0.3 0.3 0.9],'EdgeColor',[0.6 0.6 0.6]);    
        view(3)
     end
     
@@ -37,5 +37,6 @@ axis equal
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
+grid on
 
 
