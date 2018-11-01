@@ -19,6 +19,8 @@ else
     M(2,3:4) = [s r*s];
     M(3,5:8) = [t t*r t*s r*s*t];
     M(4,9:11)= [r s r*s];
+%     M(5,12:14) = [r t r*t];
+%     M(6,15:17)= [s t t*s];
 
     M = 1/dJ*T*M;
 end

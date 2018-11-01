@@ -80,6 +80,8 @@ lam = diag(l);
 f = sqrt(lam)/2/pi;
 disp(f)
 
+% T = V.'*M2*V;
+% V = V/diag(sqrt(diag(T)));
 % replace zero displacement in modeshape
 v = zeros(NDOF*NN,length(lam));
 xi = zeros(NDOF*NN,1);
@@ -89,4 +91,4 @@ v(~xi,:)=V;
 
 %%
 close all
-animate_mode(ELEM,XYZ,v(:,2))
+animate_mode(ELEM,XYZ,v(:,2),3)
