@@ -30,5 +30,5 @@ for IN = 1:numel(IP.WT)
         J      = [1 1 1;(DN*XYZ)];
     end
     dJ   = det(J);
-    Fout = Fout + N.'*N*Fin*dJ*WT;
+    Fout = Fout + N.'*Fin.'*dJ*WT;
 end
