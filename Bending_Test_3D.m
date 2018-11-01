@@ -54,7 +54,9 @@ Fe2(Fidx,1) = Fload*ones(nd,1)/nd;
 Fe2(Di,:)=[];
 
 %% Apply Fload*Ly*Lz pressure in vertical direction on element faces @ X=Lx
-[Fe, eq_num, faces] = apply_pressure(ELEM, XYZ, DN, Fload);
+
+%ERROR
+% [Fe, eq_num, faces] = apply_pressure(ELEM, XYZ, DN, Fload);
 Fe2 = Fe;
 Fe2(Di,:)=[];
 %%
