@@ -8,8 +8,8 @@ Lx = 1;
 Ly = 0.2;
 Lz = .01;
 
-Nex = 20;
-Ney = 4;
+Nex = 25;
+Ney = 6;
 Nez = 1;
 
 [XYZ, ELEM ] = hex_mesh_3D( [Lx Ly Lz], [Nex Ney Nez], 0);
@@ -47,42 +47,14 @@ nd = length(DN);
 Fi = (3*repmat(DN,1,3)-repmat([2 1 0],nd,1)).';
 Fi = Fi(:);
 
-F2 = spalloc(size(K,1),1, nd);
+Fe2 = spalloc(size(K,1),1, nd);
 Fidx = Fi(3:3:end);
 
-F2(Fidx,1) = Fload*ones(nd,1)/nd;
-F2(Di,:)=[];
+Fe2(Fidx,1) = Fload*ones(nd,1)/nd;
+Fe2(Di,:)=[];
 
 %% Apply Fload*Ly*Lz pressure in vertical direction on element faces @ X=Lx
-XYZf = NaN(size(XYZ));
-XYZf(DN,:) = XYZ(DN,:);
-en = arrayfun(@(i) find(ELEM - DN(i)==0),1:nd,'UniformOutput',false);
-ind = [];
-for ii = 1:length(en)
-    [i,j]=ind2sub(size(ELEM),en{ii});
-    
-    ind = [ind ;i];
-    
-end
-ELEMb = ELEM(unique(ind),:);
-
-
-[n, areas, faces] = getsurfacenormals(ELEMb, XYZf);
-A = sum(areas);
-[nFE,NPF] = size(faces);
-
-for ii = 1 : size(n,1)
-    Fout(:,:,ii) = SurfaceInt(XYZ(faces(ii,:),:),[0;0;Fload/A]).';
-end
-
-
-Fi=NDOF*faces(:,kron(1:NPF,ones(1,NDOF)))-kron(ones(nFE,1),kron(ones(1,NPF),(NDOF-1):-1:0));
-Y = reshape(Fi,NPF,NDOF,nFE);
-Fi = Fi.';
-Fi(:)
-
-X=permute(Y,[2 1 3]);
-Fe = sparse(X(:),ones(size(X(:))),Fout(:));
+[Fe, eq_num, faces] = apply_pressure(ELEM, XYZ, DN, Fload);
 Fe2 = Fe;
 Fe2(Di,:)=[];
 %%
@@ -96,12 +68,12 @@ X(~xi,:)=x;
 show_mesh(ELEM,XYZ+reshape(X,3,[]).')
 hold all
 
-% nF = unique(faces);
-% Fidx = NDOF*kron(nF, ones(1,NDOF))-kron(ones(nd,1),[2 1 0]);
-% Xdisp = reshape(X,3,[]).';
-% for ii = 1:nd
-%     quiver3(XYZ(nF(ii),1)+Xdisp(nF(ii)),XYZ(nF(ii),2)+Xdisp(nF(ii),2),XYZ(nF(ii),3)+Xdisp(nF(ii),3), full(Fe(Fidx(ii,1)))/1e3, full(Fe(Fidx(ii,2)))/1e3,  full(Fe(Fidx(ii,3)))/1e3)
-% end
+nF = unique(faces);
+Fidx = NDOF*kron(nF, ones(1,NDOF))-kron(ones(nd,1),[2 1 0]);
+Xdisp = reshape(X,3,[]).';
+for ii = 1:nd
+    quiver3(XYZ(nF(ii),1)+Xdisp(nF(ii)),XYZ(nF(ii),2)+Xdisp(nF(ii),2),XYZ(nF(ii),3)+Xdisp(nF(ii),3), full(Fe(Fidx(ii,1)))/1e3, full(Fe(Fidx(ii,2)))/1e3,  full(Fe(Fidx(ii,3)))/1e3)
+end
     
 Xd = reshape(X(Fi),3,[]).';
 
