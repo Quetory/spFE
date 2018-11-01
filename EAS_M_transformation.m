@@ -1,8 +1,8 @@
-function [F0] = EAS_M_transformation(XYZ)
+function [F0,dJ0] = EAS_M_transformation(XYZ,XI)
 NPE = size(XYZ,1);
 
 if NPE==8
-    [~,DN] = shape3D8([0,0,0]);
+    [~,DN] = shape3D8(XI);
     J0 = DN*XYZ;
     J0i = (eye(3)/J0) ;
     dJ0 = det(J0);
@@ -22,16 +22,16 @@ if NPE==8
               T(1,2)*T(2,3)+T(1,3)*T(2,2) T(2,2)*T(3,3)+T(2,3)*T(3,2)  T(1,2)*T(3,3)+T(1,3)*T(3,2) ;...
               T(1,1)*T(2,3)+T(1,3)*T(2,1) T(2,1)*T(3,3)+T(2,3)*T(3,1)  T(1,1)*T(3,3)+T(1,3)*T(3,1) ];
 
-    F0 = dJ0*[T11 T12; T21 T22];
+    F0 = [T11 T12; T21 T22];
 
 elseif NPE==4
-     [~,DN] = shape2D4([0,0]);
+     [~,DN] = shape2D4(XI);
      J0 = DN*XYZ;
      J0i = (eye(2)/J0) ;
      dJ0 = det(J0);
      T = J0i.';
      
-     F0 = dJ0*[             (T.*T).'          [2*T(1,1)*T(2,1); 2*T(1,2)*T(2,2)]  ;...
+     F0 = [             (T.*T).'          [2*T(1,1)*T(2,1); 2*T(1,2)*T(2,2)]  ;...
                 T(1,1)*T(1,2) T(2,1)*T(2,2)    T(1,1)*T(2,2)+T(1,2)*T(2,1)     ];
      
 end

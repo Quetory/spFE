@@ -50,7 +50,8 @@ end
    
         
 if eas
-    [T] = EAS_M_transformation(XYZ);
+    [T0, dJ0] = EAS_M_transformation(XYZ,[0 0 0]);
+    T0 = T0*dJ0;
     m(2) = 4;
     m(3) = 11;
 %     m(3) = 17;
@@ -74,7 +75,7 @@ for IN = 1:numel(IP.WT)
     elseif NPE ==4 && eas
         [~,DN] = shape2D4(XI);
         [B,dJ] = StrainDispMatrix(DN,XYZ); 
-        [M]    = EAS_Matrix(XI,T,dJ);
+        [M]    = EAS_Matrix(XI,T0,dJ);
         L = L + WT*(M.')*D*B*dJ;
         Q = Q + WT*(M.')*D*M*dJ;
         
@@ -85,7 +86,11 @@ for IN = 1:numel(IP.WT)
     elseif NPE == 8 && eas
         [~,DN] = shape3D8(XI);
         [B,dJ] = StrainDispMatrix(DN,XYZ);
-        [M]    = EAS_Matrix(XI,T,dJ);
+        [Bans,dJ] = ANS_interpolation(DN,XI,XYZ);
+        [Ti,~] = EAS_M_transformation(XYZ,XI);
+        B= Ti*Bans;
+        
+        [M]    = EAS_Matrix(XI,T0,dJ);
         
         L = L + WT*(M.')*D*B*dJ;
         Q = Q + WT*(M.')*D*M*dJ;

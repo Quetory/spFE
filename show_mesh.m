@@ -27,8 +27,38 @@ elseif size(coordinates,2)==3   %3D object
        Y=reshape(coordinates(faces',2),size(faces,2),size(faces,1)); 
        Z=reshape(coordinates(faces',3),size(faces,2),size(faces,1)); 
        
+       subplot(221)
        patch(X,Y,Z,[0.3 0.3 0.9],'EdgeColor',[0.6 0.6 0.6]);    
        view(3)
+       axis equal
+       xlabel('X');
+       ylabel('Y');
+       zlabel('Z');
+       
+       subplot(222)
+       patch(X,Y,Z,[0.3 0.3 0.9],'EdgeColor',[0.6 0.6 0.6]);    
+       view([0 0 ])
+       axis equal
+       xlabel('X');
+       ylabel('Y');
+       zlabel('Z');
+       
+       subplot(223)
+       patch(X,Y,Z,[0.3 0.3 0.9],'EdgeColor',[0.6 0.6 0.6]);    
+       view([90 0])
+       axis equal
+       xlabel('X');
+       ylabel('Y');
+       zlabel('Z');
+       
+       subplot(224)
+       patch(X,Y,Z,[0.3 0.3 0.9],'EdgeColor',[0.6 0.6 0.6]);    
+       view([0 90])
+       axis equal
+       xlabel('X');
+       ylabel('Y');
+       zlabel('Z');       
+       
     end
     
 end
