@@ -1,6 +1,8 @@
 function animate_mode(elements,coordinates, shape,NDOF)
 Nperiods = 2;
 freq = 0.025;
+sc   = ones(3,1);
+
 if size(coordinates,2)==2    %2D objects 
     if size(elements,2)==3   %triangle         
         X=reshape(coordinates(elements',1),size(elements,2),size(elements,1));
@@ -22,9 +24,14 @@ elseif size(coordinates,2)==3   %3D object
 
        figure
        vanim = reshape(shape,NDOF,size(coordinates,1)).';
-      
+       
        if NDOF==3 
+           [~,midx]=max(max(vanim));
+           sc(midx)=1.5;
+           
            alimits = [min(coordinates-vanim).' max(coordinates+vanim).'];
+           alimits = diag(sc)*alimits;
+           
            for t = 1: ceil(Nperiods/freq)
                clf
                mode = coordinates + vanim*sin(2*pi*freq*t);
@@ -37,6 +44,8 @@ elseif size(coordinates,2)==3   %3D object
                ylim(alimits(2,:));
                zlim(alimits(3,:));
                view(3)
+               
+               grid on
                drawnow;
            end
        elseif NDOF==1

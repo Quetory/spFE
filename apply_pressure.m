@@ -1,4 +1,4 @@
-function [Fe, node_num, faces] = apply_pressure(ELEM, XYZ, NN, Fload)
+function [Fe, node_num, faces] = apply_pressure(ELEM, XYZ, NN, Pressure)
 
 XYZf = NaN(size(XYZ));
 XYZf(NN,:) = XYZ(NN,:);
@@ -23,7 +23,7 @@ A = sum(areas);
 Fout = zeros(NDOF,NPF,NFE);
 
 for ii = 1 : NFE
-    Fout(:,:,ii) = SurfaceInt(XYZ(faces(ii,:),:),[0;0;Fload/A]).';
+    Fout(:,:,ii) = SurfaceInt(XYZ(faces(ii,:),:),[0;0;Pressure]).';
 end
 
 Fidx = NDOF*faces(:,kron(1:NPF,ones(1,NDOF)))-kron(ones(NFE,1),kron(ones(1,NPF),(NDOF-1):-1:0));
