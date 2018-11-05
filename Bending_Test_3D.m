@@ -3,11 +3,11 @@ clc
 
 %% Define geometry
 Lx = 1;
-Ly = 0.2;
+Ly = 1;
 Lz = .01;
 
-Nex = 50;
-Ney = 10;
+Nex = 4;
+Ney = 4;
 Nez = 1;
 
 [XYZ, ELEM ] = hex_mesh_3D( [Lx Ly Lz], [Nex Ney Nez], 0);
@@ -65,6 +65,12 @@ Pload = Fload/Ly/Lz;
 Fe2 = Fe;
 Fe2(Di,:)=[];
 
+%%
+
+NN = find(XYZ(:,3)==Lz );
+nd = length(NN);
+
+return
 %%
 x = K2\Fe2;
 
