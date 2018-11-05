@@ -47,7 +47,7 @@ end
 
 if NDOF==2 
      D = E/(1-nu^2)*[1 nu 0; nu 1 0; 0 0 (1-nu)/2];                 %assuming plane stress
-     D = E/((1+nu)*(1-2*nu))*[1-nu nu 0; nu 1-nu 0; 0 0 1-2*nu];    %assuming plane strain
+%      D = E/((1+nu)*(1-2*nu))*[1-nu nu 0; nu 1-nu 0; 0 0 1-2*nu];    %assuming plane strain
 elseif NDOF==3
     D = diag( [1-nu, 1-nu,1-nu, 1/2-nu, 1/2-nu, 1/2-nu])/2;
     D = D + diag([nu,nu,0,0,0],1) + diag([nu,0,0,0],2);
