@@ -1,9 +1,7 @@
 clear,close all
 clc
 
-Fload = 1000;
-
-%%
+%% Define geometry
 Lx = 1;
 Ly = 0.2;
 Lz = .01;
@@ -12,7 +10,6 @@ Nex = 50;
 Ney = 10;
 Nez = 1;
 
-Pload = Fload/Ly*Lz;
 [XYZ, ELEM ] = hex_mesh_3D( [Lx Ly Lz], [Nex Ney Nez], 0);
 
 [NN,NDOF] = size(XYZ);
@@ -40,26 +37,29 @@ K2(:,Di)=[];
 M2(Di,:)=[];
 M2(:,Di)=[];
 
-%%
-
-[V,D,flag] = eigs(K2,M2,6,'sm');%,'IsCholesky',true,'CholeskyPermutation',s);
-
 
 %% Modal analysis
-N = vecnorm(V,2,1);
-Vn = V/diag(N);
-
-X = zeros(NDOF*NN,1);
-xi = zeros(NDOF*NN,1);
-xi(Di)=1;
-X(~xi,:)=Vn(:,5);
-
-animate_mode(ELEM,XYZ,X,NDOF);
-return
+% [V,D ] = eigs(K2,M2,6,'sm');%,'IsCholesky',true,'CholeskyPermutation',s);
+% N = vecnorm(V,2,1);
+% Vn = V/diag(N); % Normalize shape functions
+% 
+% X = zeros(NDOF*NN,1);
+% xi = zeros(NDOF*NN,1);
+% xi(Di)=1;
+% X(~xi,:)=Vn(:,2);
+% l = sqrt(diag(D))/2/pi;
+% disp(['Resonance Frequency: ' num2str(l(2),3) ' Hz'])
+% 
+% animate_mode(ELEM,XYZ,X,NDOF);
+% 
+% return
 %% Apply Fload*Ly*Lz pressure in vertical direction on element faces @ X=Lx
 tol = 1e-6;
 DN = find(XYZ(:,1)==1 );
 nd = length(DN);
+
+Fload = 1e3;
+Pload = Fload/Ly/Lz;
 
 [Fe, nF, faces] = apply_pressure(ELEM, XYZ, DN, Pload);
 Fe2 = Fe;
@@ -92,7 +92,7 @@ for ii = 1:nd
     quiver3(DX, DY, DZ, U, V, W);
 end
     
-Xd = reshape(X(Fi),3,[]).';
+Xd = X(Fidx);
 
 %%
 I = Lz^3*Ly/12;

@@ -24,7 +24,7 @@ elseif size(coordinates,2)==3   %3D object
 
        figure
        vanim = reshape(shape,NDOF,size(coordinates,1)).';
-       
+       set(gcf,'position',[680   208   851   770]);
        if NDOF==3 
            [~,midx]=max(max(vanim));
            sc(midx)=1.5;
@@ -38,7 +38,7 @@ elseif size(coordinates,2)==3   %3D object
                X=reshape(mode(faces',1),size(faces,2),size(faces,1));
                Y=reshape(mode(faces',2),size(faces,2),size(faces,1)); 
                Z=reshape(mode(faces',3),size(faces,2),size(faces,1)); 
-               patch(X,Y,Z,[0.3 0.3 0.9]);
+               patch(X,Y,Z,[0.3 0.8 0.9]);
                axis equal
                xlim(alimits(1,:));
                ylim(alimits(2,:));
@@ -57,7 +57,7 @@ elseif size(coordinates,2)==3   %3D object
             Z = reshape(coordinates(faces',3),size(faces,2),size(faces,1));
             P = zeros(size(Z));
             h = patch(X,Y,Z,P,'EdgeColor','interp' );
-            set(gcf,'position',[680   208   851   770]);
+%             set(gcf,'position',[680   208   851   770]);
             axis equal
             xlim(alimits(1,:));
             ylim(alimits(2,:));
