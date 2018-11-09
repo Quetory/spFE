@@ -103,5 +103,19 @@ animate_mode(ELEMa,XYZa,X(NDOF*NN+1:end),1);
 animate_mode(ELEMs,XYZs,X(1:NDOF*NN),3);
 
 %%
+tol = 1e-6;
+DN = find(XYZ(:,1)==Lx_s/2 &  XYZ(:,2)==Ly_s/2  & XYZ(:,3)==0 );
+nd = length(DN);
 
+Fload = 1e3;
+
+Fe = sparse(size(K,1),1);
+Fe(DN*3) = Fload;
+
+Fe2 = Fe;
+Fe2(Di) = [];
+
+
+
+%%
 
