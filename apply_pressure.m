@@ -16,8 +16,8 @@ end
 ELEMb = ELEM(unique(ind),:);
 % show_mesh(ELEMb,XYZf)
 
-[n, areas, faces] = getsurfacenormals(ELEMb, XYZf);
-A = sum(areas);
+[~, ~, faces] = getsurfacenormals(ELEMb, XYZf);
+
 [NFE,NPF] = size(faces);
 
 Fout = zeros(NDOF,NPF,NFE);

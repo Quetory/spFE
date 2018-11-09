@@ -22,7 +22,6 @@ mat.nu = 0.33;
 [M, K] = assemble_system_matrices(ELEM, XYZ, mat, 'STRUCT');
 
 %% Fixed boundary nodes. XYZ DoFs constrained
-tol = 1e-6;
 DN = find(XYZ(:,1)==0);
 nd = length(DN);
 

@@ -2,6 +2,7 @@ function animate_mode(elements,coordinates, shape,NDOF)
 Nperiods = 2;
 freq = 0.025;
 sc   = ones(3,1);
+gain = 4;
 
 if size(coordinates,2)==2    %2D objects 
     if size(elements,2)==3   %triangle         
@@ -23,15 +24,21 @@ elseif size(coordinates,2)==3   %3D object
        faces=[faces1; faces2; faces3; faces4; faces5; faces6];
 
        figure
+        if ~isreal(shape)
+                vmag = abs(shape);
+                vph  = angle(shape);
+                shape = vmag.*sin(vph);
+        end
+
+            
        vanim = reshape(shape,NDOF,size(coordinates,1)).';
        set(gcf,'position',[680   208   851   770]);
        if NDOF==3 
-           [~,midx]=max(max(vanim));
-           sc(midx)=1.5;
-           
-           alimits = [min(coordinates-vanim).' max(coordinates+vanim).'];
+           [mval,midx]=max(max(abs(vanim)));
+           vanim = vanim*max(abs(coordinates(:,midx)))/mval*gain;
+           alimits = [min(coordinates-abs(vanim)).' max(coordinates+abs(vanim)).'];
+           sc(midx) = 1.5;
            alimits = diag(sc)*alimits;
-           
            for t = 1: ceil(Nperiods/freq)
                clf
                mode = coordinates + vanim*sin(2*pi*freq*t);
@@ -50,7 +57,14 @@ elseif size(coordinates,2)==3   %3D object
            end
        elseif NDOF==1
             alimits = [1.05*min(coordinates).' 1.05*max(coordinates).'];
-            [s,l]=bounds(vanim);
+            if ~isreal(vanim)
+                vmag = abs(vanim);
+                vph  = angle(vanim);
+                [s,l]=bounds(vmag.*sin(vph));
+                vanim = vmag.*sin(vph);
+            else                
+                [s,l]=bounds(vanim);
+            end
             
             X=reshape(coordinates(faces',1),size(faces,2),size(faces,1));
             Y=reshape(coordinates(faces',2),size(faces,2),size(faces,1)); 
