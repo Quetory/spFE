@@ -42,4 +42,4 @@ for IN = 1:numel(IP.WT)
     Kelem = Kelem + WT*(DNj.')*DNj*dJ;
 end
 
-Kelem = rho*c^2*Kelem;
+% Kelem = Kelem;
