@@ -6,8 +6,8 @@ Lx_s = 0.5;
 Ly_s = 0.5;
 Lz_s = .01;
 
-Nex = 20;
-Ney = 20;
+Nex = 30;
+Ney = 30;
 Nez = 1;
 
 [XYZs, ELEMs ] = hex_mesh_3D( [Lx_s Ly_s Lz_s], [Nex Ney Nez], 0);
@@ -20,6 +20,7 @@ mat(1).E = 800e6*7.4940;
 mat(1).nu = 0.3;
 
 [Ms, Ks] = assemble_system_matrices(ELEMs, XYZs, mat(1), 'STRUCT');
+
 
 %% Define geometry for acoustic volume
 Lz_a = 1;
@@ -78,31 +79,37 @@ K2(:,Di)=[];
 M2(Di,:)=[];
 M2(:,Di)=[];
 %%
-[V,D ] = eigs(K2,M2,6,'sm');%,'IsCholesky',true,'CholeskyPermutation',s);
+
+[ V,D ] = eigs(-Kf,Mf,10,'sm','Tolerance',1e-24,'MaxIterations',1000,'SubspaceDimension',30);%,'IsCholesky',true,'CholeskyPermutation',s);
+
 N = vecnorm(V,2,1);
 Vn = V/diag(N); % Normalize shape functions
 
 X = zeros(NDOF*NN+NNa,1);
 xi = zeros(NDOF*NN+NNa,1);
+
+X = zeros(0*NN+NNa,1);
+xi = zeros(0*NN+NNa,1);
+Di=[];
 xi(Di)=1;
 
-n = 2;
+n = 5;
 X(~xi,:)=V(:,n);
-l = sqrt(diag(D))/2/pi;
+l = sqrt(diag(-D))/2/pi;
 
 clc
-disp(real(l))
+disp([ (1:10).' , real(l)])
 fres = CalcClampedPlateFres(Lx_s,Ly_s,Lz_s,mat(1));
 disp(['First plate resonance (mode 11) analytic: ' num2str(fres,3) ' Hz'])
 disp(['Resonance Frequency: ' num2str(l(n),3) ' Hz'])
 
 %% Plot structural mode of plate
 close all
-animate_mode(ELEMa,XYZa,X(NDOF*NN+1:end),1);
-
+animate_mode(ELEMa,XYZa,X(0*NDOF*NN+1:end),1);
+% 
 % Plot acoustic mode of cavity
-animate_mode(ELEMs,XYZs,X(1:NDOF*NN),3);
-
+% animate_mode(ELEMs,XYZs,X(1:NDOF*NN),3);
+return
 %% Static load 
 tol = 1e-6;
 DN = find(XYZ(:,1)==Lx_s/2 &  XYZ(:,2)==Ly_s/2  & XYZ(:,3)==0 );
@@ -117,8 +124,8 @@ Fe2 = Fe;
 Fe2(Di) = [];
 
 %% Harmonic response
-Nf = 400;
-f = logspace(2,log10(200),Nf);
+Nf = 200;
+f = logspace(log10(160),log10(180),Nf);
 
 xi = zeros(NDOF*NN+NNa,1);
 xi(Di)=1;
