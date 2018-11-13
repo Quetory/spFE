@@ -9,18 +9,16 @@ qs = zeros(Nk,k);
 
 qs(:,1) = -M*rand(Nk,1);
 %% Generate k Krylov vectors
-
+% Advance theKrylov subspace to get qs(:,i+1)
+H = K-s0*M;
+[L,U,P,Q,D] = lu(H);
+     
 for i = 1 : k
      qn = norm(qs(:,i),2);
 
      % Normalize qs(:,i) to obtain q(:,i)
      q(:,i) = qs(:,i)/qn;
      
-
-     % Advance theKrylov subspace to get qs(:,i+1)
-     H = K-s0*M;
-
-     [L,U,P,Q,D] = lu(H);
      qs(:,i+1) = Q*(U\(L\(P*(D\q(:,i)))));
      qn = norm( qs(:,i+1) );
          
@@ -53,3 +51,21 @@ l = sqrt(-D)/2/pi;
 
 disp(diag(l));
 V = q*Vs;
+
+
+%%
+D = zeros(n,length(10:5:k));
+l = zeros(n,length(10:5:k));
+cnt = 1;
+for j = 10:5:k
+    Q = q(:,1:j);
+    Kst = Q.'*K*Q;
+    Mst = Q.'*M*Q; 
+    D(:,cnt)=eigs(-Kst,Mst,n,'sm');
+    l(:,cnt) = sqrt(-real(D(:,cnt)))/2/pi;
+    
+    cnt = cnt +1;
+end
+
+figure(100)
+semilogy(15:5:k,abs(diff(real(l(2:6,:)),[],2)))

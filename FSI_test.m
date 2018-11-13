@@ -6,8 +6,8 @@ Lx_s = 0.5;
 Ly_s = 0.5;
 Lz_s = .01;
 
-Nex = 30;
-Ney = 30;
+Nex = 15;
+Ney = 15;
 Nez = 1;
 
 [XYZs, ELEMs ] = hex_mesh_3D( [Lx_s Ly_s Lz_s], [Nex Ney Nez], 0);
@@ -25,7 +25,7 @@ mat(1).nu = 0.3;
 %% Define geometry for acoustic volume
 Lz_a = 1;
 
-Nez = 24;
+Nez = 18;
 
 [XYZa, ELEMa ] = hex_mesh_3D( [Lx_s Ly_s Lz_a], [Nex Ney Nez], 0);
 
@@ -80,20 +80,20 @@ M2(Di,:)=[];
 M2(:,Di)=[];
 %%
 
-[ V,D ] = eigs(-Kf,Mf,10,'sm','Tolerance',1e-24,'MaxIterations',1000,'SubspaceDimension',30);%,'IsCholesky',true,'CholeskyPermutation',s);
+% [ V,D ] = eigs(-Kf,Mf,10,'sm','Tolerance',1e-24,'MaxIterations',1000,'SubspaceDimension',30);%,'IsCholesky',true,'CholeskyPermutation',s);
+[V,D] = eigs_unsym(M2,K2,(2*pi*344)^2,400,8);
 
-N = vecnorm(V,2,1);
-Vn = V/diag(N); % Normalize shape functions
 
+return
 X = zeros(NDOF*NN+NNa,1);
 xi = zeros(NDOF*NN+NNa,1);
 
-X = zeros(0*NN+NNa,1);
-xi = zeros(0*NN+NNa,1);
-Di=[];
+% X = zeros(NN+NNa,1);
+% xi = zeros(NN+NNa,1);
+% Di=[];
 xi(Di)=1;
 
-n = 5;
+n = 2;
 X(~xi,:)=V(:,n);
 l = sqrt(diag(-D))/2/pi;
 
@@ -105,7 +105,7 @@ disp(['Resonance Frequency: ' num2str(l(n),3) ' Hz'])
 
 %% Plot structural mode of plate
 close all
-animate_mode(ELEMa,XYZa,X(0*NDOF*NN+1:end),1);
+animate_mode(ELEMa,XYZa,X(NDOF*NN+1:end),1);
 % 
 % Plot acoustic mode of cavity
 % animate_mode(ELEMs,XYZs,X(1:NDOF*NN),3);
