@@ -78,81 +78,18 @@ A(:,Di)=[];
 
 B(Di,:)=[];
 B(:,Di)=[];
-return
+
 %%
 
 % [ V,D ] = eigs(-Kf,Mf,10,'sm','Tolerance',1e-24,'MaxIterations',1000,'SubspaceDimension',30);%,'IsCholesky',true,'CholeskyPermutation',s);
 % [V,D] = eigs_unsym(M2,K2,(2*pi*166)^2,100,8);
 % [V,D] = eigs_unsym_v2(M2,K2,10,(2*pi*166)^2,50,8);
-[V,D,W] = eigs_unsym_v3(M2,K2,(2*pi*166),80,8);
+% [V,D,W] = eigs_unsym_v3(B,A,(2*pi*166),80,8);
+[W,V,D,resl,resr] = eigs_unsym_v2(-A,B,(2*pi*166)^2);
 
+return
 %%
-s0 = (2*pi*160)^2;
-problem = 2;
-precond = 1;
-maxeig = 10;   % number of required eigenvalues
-nb = 1;       % initial blocksize
-maxit = 200;   % maximum number of Lanczos-iter, altered by maxmsz
-matbal = 1;   % whether balance the matrix (only for standard eigenproblem)
-fulldual = 1; % use full-duality if fulldual = 1
-semidual = 0; % maintain semi-duality if semidual = 1
-group = 0;    % adapt to the order of the largest cluster if group = 1
-treatbd = 0;  % cure breakdown if treatbd = 1.
 
-
-n = size(A,1);  % the order the matrix A
-maxmsz = n;     % maximal memory array size for storing Lanczos vectors (P,Q)
-anorm0 = max( norm(A,1), norm(B,1) );
-
-anorm = anorm0; 
-fanorm = anorm0;  
-nonnormal = norm(A'*A-A*A','fro')/norm(A*A,'fro')
-
-[L,U,P,Q,D] = lu( -A - s0*B );
-[c,v] = condest( -A - s0*B );  
-fanorm = c/anorm;  
-
-tic     
-[j,szoft,T,ritzvalue,VL,VR,P,Q,ip,neig,ritz,ipritz,resl,resr,omega,duality,exdual,tolconv] = pable(problem,fulldual,semidual,group,treatbd,n,maxmsz,maxeig,nb,maxit,precond,A,B,s0,L,U,P,Q,D,fanorm);
-toc
-
-ritzvalue = s0 + 1./ritzvalue; 
-ritz = s0 + 1./ritz; 
-
-for k = 1:neig 
-    Z(:,k) = Q(:,1:szoft)*VR(:,ipritz(k)); 
-    W(:,k) = conj(P(:,1:szoft))*VL(:,ipritz(k)); 
-end 
-if problem == 2
-    W(:,1:neig) = B'\W(:,1:neig);  
-end  
-%
-%     compute exact residuals 
-%
-  for k = 1:neig
-      if problem == 1
-         if matbal == 1
-%                Res_left = W(:,k)'*(D*A\D) - ritz(k)*W(:,k)'; 
-%                Res_right = (D*A\D)*Z(:,k) - Z(:,k)*ritz(k);  
-            Res_left = W(:,k)'*A - ritz(k)*W(:,k)'; 
-            Res_right = A*Z(:,k) - Z(:,k)*ritz(k);  
-         else 
-            Res_left = W(:,k)'*A - ritz(k)*W(:,k)'; 
-            Res_right = A*Z(:,k) - Z(:,k)*ritz(k);  
-         end 
-      else
-         Res_left = W(:,k)'*A - ritz(k)*W(:,k)'*B; 
-         Res_right = A*Z(:,k) - B*Z(:,k)*ritz(k);  
-      end 
-      resl_e(k) = norm(Res_left) /(anorm0*norm(W(:,k)));
-      resr_e(k) = norm(Res_right)/(anorm0*norm(Z(:,k)));
-  end
-%
-%     compute condition numbers       
-%
-for k = 1:neig
-  condnum(k) = norm(W(:,k))*norm(Z(:,k))/ abs(W(:,k)'* Z(:,k));
-end 
 %%
 
 X = zeros(NDOF*NN+NNa,1);
@@ -165,8 +102,8 @@ xi(Di)=1;
 %% Plot structural mode of plate
 n = 4;
 X(~xi,:)=V(:,n);
-% l = sqrt(diag(-D))/2/pi;
-% disp(l)
+l = sqrt(-D)/2/pi;
+disp(l)
 % clc
 % disp([ (1:8).' , real(l)])
 % fres = CalcClampedPlateFres(Lx_s,Ly_s,Lz_s,mat(1));
