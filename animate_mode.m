@@ -2,7 +2,7 @@ function animate_mode(elements,coordinates, shape,NDOF)
 Nperiods = 2;
 freq = 0.025;
 sc   = ones(3,1);
-gain = 4;
+gain = 0.2;
 
 if size(coordinates,2)==2    %2D objects 
     if size(elements,2)==3   %triangle         
@@ -31,25 +31,33 @@ elseif size(coordinates,2)==3   %3D object
         end
 
             
-       vanim = reshape(shape,NDOF,size(coordinates,1)).';
+       vanim_o = reshape(shape,NDOF,size(coordinates,1)).';
        set(gcf,'position',[680   208   851   770]);
        if NDOF==3 
-           [mval,midx]=max(max(abs(vanim)));
-           vanim = vanim*max(abs(coordinates(:,midx)))/mval*gain;
+           [mval,midx]=max(max(abs(vanim_o)));
+           vanim = vanim_o/mval*gain;
            alimits = [min(coordinates-abs(vanim)).' max(coordinates+abs(vanim)).'];
-           sc(midx) = 1.5;
-           alimits = diag(sc)*alimits;
+           sc(midx) = 1.1;
+           alimits = [1./sc sc].*alimits;
+           colormap jet
+           
+           Clim = sqrt(sum(vanim_o.^2,2));
            for t = 1: ceil(Nperiods/freq)
                clf
                mode = coordinates + vanim*sin(2*pi*freq*t);
+               Col = vanim_o*sin(2*pi*freq*t);
+               C = sqrt(sum(Col.^2,2));
                X=reshape(mode(faces',1),size(faces,2),size(faces,1));
                Y=reshape(mode(faces',2),size(faces,2),size(faces,1)); 
                Z=reshape(mode(faces',3),size(faces,2),size(faces,1)); 
-               patch(X,Y,Z,[0.3 0.8 0.9]);
+               Col = reshape(C(faces'),size(faces,2),size(faces,1));
+               patch(X,Y,Z,Col);%,'EdgeColor','interp' );%[0.3 0.8 0.9]);
                axis equal
                xlim(alimits(1,:));
                ylim(alimits(2,:));
                zlim(alimits(3,:));
+               caxis([min(Clim) max(Clim)]);
+               colorbar
                view(3)
                
                grid on
@@ -57,13 +65,14 @@ elseif size(coordinates,2)==3   %3D object
            end
        elseif NDOF==1
             alimits = [1.05*min(coordinates).' 1.05*max(coordinates).'];
-            if ~isreal(vanim)
-                vmag = abs(vanim);
-                vph  = angle(vanim);
+            if ~isreal(vanim_o)
+                vmag = abs(vanim_o);
+                vph  = angle(vanim_o);
                 [s,l]=bounds(vmag.*sin(vph));
                 vanim = vmag.*sin(vph);
             else                
-                [s,l]=bounds(vanim);
+                [s,l]=bounds(vanim_o);
+                vanim = vanim_o;
             end
             
             X=reshape(coordinates(faces',1),size(faces,2),size(faces,1));

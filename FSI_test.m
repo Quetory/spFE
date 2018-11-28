@@ -6,8 +6,8 @@ Lx_s = 0.5;
 Ly_s = 0.5;
 Lz_s = .01;
 
-Nex = 15;
-Ney = 15;
+Nex = 25;
+Ney = 25;
 Nez = 1;
 
 [XYZs, ELEMs ] = hex_mesh_3D( [Lx_s Ly_s Lz_s], [Nex Ney Nez], 0);
@@ -40,44 +40,79 @@ mat(2).rho = 1.18;
 mat(2).c = 343;
 [Mf, Kf] = assemble_system_matrices(ELEMa, XYZa, mat(2), 'ACOU');
 
+%% Define geometry for second structural plate
+
+Nez = 1;
+
+[XYZs2, ELEMs2 ] = hex_mesh_3D( [Lx_s Ly_s Lz_s], [Nex Ney Nez], 0);
+
+
+%offset z-axis 
+XYZs2(:,3) = XYZs2(:,3) + Lz_s + Lz_a;
+
+%% Assemble system matrices for second structural plate
+
+mat(3).rho = 1000;
+mat(3).E = 800e6*7.4940;
+mat(3).nu = 0.3;
+[Ms2, Ks2] = assemble_system_matrices(ELEMs2, XYZs2, mat(3), 'STRUCT');
 
 %%
-ELEM = [ELEMs; ELEMa+NN];
-XYZ  = [XYZs; XYZa];
+ELEM = [ELEMs; ELEMa+NN; ELEMs2+NN+NNa];
+XYZ  = [XYZs; XYZa; XYZs2];
 
 show_mesh(ELEM, XYZ)
 
-%%
-M = blkdiag(Ms,Mf);
-K = blkdiag(Ks,Kf);
+%% Assemble global system matrices
+M = blkdiag(Ms,Mf,Ms2);
+K = blkdiag(Ks,Kf,Ks2);
 
-s.tot = size(K,1);
-s.off = length(XYZs)*(NDOF-1);
-%%
+%% Create FSI coupling matrix
 DNs = find(XYZs(:,3)==Lz_s);
 DNa = find(XYZa(:,3)==Lz_s)+NN;
 
+s.tot = size(K,1);
+s.off = [0 length(XYZs)*(NDOF-1)]; % correction for DoFs counting
 [R] = FSI_coupling_matrix(ELEM,XYZ,DNs,DNa,s);
 
-%%
-M = M + mat(2).rho*R.';
-K = K - R;
+
+DNs = find(XYZs2(:,3)==Lz_s+Lz_a)+NN+NNa;
+DNa = find(XYZa(:,3)==Lz_s+Lz_a)+NN;
+
+s.off = [-length(XYZa)*(NDOF-1) length(XYZs)*(NDOF-1)]; % correction for DoFs counting
+[R2] = FSI_coupling_matrix(ELEM,XYZ,DNs,DNa,s);
 
 %%
+M = M + mat(2).rho*R.' + mat(2).rho*R2.';
+K = K - R - R2 ;
+
+%% Find nodes for fixed support constraint
+% find edges of plate 1
 DN = unique([ find(XYZs(:,2)==0) ; find(XYZs(:,2)==Ly_s) ; find(XYZs(:,1)==0) ; find(XYZs(:,1)==Lx_s)]);
+% DN = unique([ find(XYZs(:,3)==0) ; find(XYZs(:,3)==Ly_s)]);
+% find edges of plate 
+DN2 = unique([ find(XYZs2(:,2)==0) ; find(XYZs2(:,2)==Ly_s) ; find(XYZs2(:,1)==0) ; find(XYZs2(:,1)==Lx_s)]) + NN + NNa;
 
 nd = length(DN);
 
 Di = (NDOF*repmat(DN,1,3)-repmat([2 1 0],nd,1)).';
 Di = Di(:);
 
+nd2 = length(DN2);
+Di2 = (NDOF*repmat(DN2,1,3)-repmat([2 1 0],nd2,1)).';
+Di2 = Di2 - length(XYZa)*(NDOF-1);% correct for missing 2 DoF of the pressure nodes
+Di2 = Di2(:);
+
+%% Apply zero displacment constraints to system matrices
+
 A=K;
 B=M;
-A(Di,:)=[];
-A(:,Di)=[];
+A([Di; Di2],:)=[];
+A(:,[Di; Di2])=[];
 
-B(Di,:)=[];
-B(:,Di)=[];
+B([Di; Di2],:)=[];
+B(:,[Di; Di2])=[];
+
 
 %%
 
@@ -85,37 +120,36 @@ B(:,Di)=[];
 % [V,D] = eigs_unsym(M2,K2,(2*pi*166)^2,100,8);
 % [V,D] = eigs_unsym_v2(M2,K2,10,(2*pi*166)^2,50,8);
 % [V,D,W] = eigs_unsym_v3(B,A,(2*pi*166),80,8);
-[W,V,D,resl,resr] = eigs_unsym_v2(-A,B,(2*pi*166)^2);
+neig = 10;
+[W,V,D,resl,resr] = eigs_unsym_v2(A,B,(2*pi*166)^2 , neig);
+
+l = sqrt(D)/2/pi;
+disp(real(l))
 
 return
-%%
 
-%%
+%% Animate modes
 
-X = zeros(NDOF*NN+NNa,1);
-xi = zeros(NDOF*NN+NNa,1);
+n = 3; % Select mode number
 
-% X = zeros(NN+NNa,1);
-% xi = zeros(NN+NNa,1);
-% Di=[];
-xi(Di)=1;
-%% Plot structural mode of plate
-n = 4;
+X = zeros(NDOF*NN+NNa+NDOF*NN,1);
+xi = zeros(NDOF*NN+NNa+NDOF*NN,1);
+
+xi([Di; Di2])=1;
 X(~xi,:)=V(:,n);
-l = sqrt(-D)/2/pi;
-disp(l)
-% clc
-% disp([ (1:8).' , real(l)])
-% fres = CalcClampedPlateFres(Lx_s,Ly_s,Lz_s,mat(1));
-% disp(['First plate resonance (mode 11) analytic: ' num2str(fres,3) ' Hz'])
-% disp(['Resonance Frequency: ' num2str(l(3),3) ' Hz'])
 
-
+clc
 close all
-animate_mode(ELEMa,XYZa,X(NDOF*NN+1:end),1);
-% 
+disp(real(l(n)))
+animate_mode(ELEMa,XYZa,X(NDOF*NN+1:NDOF*NN+NNa),1);
+
 % Plot acoustic mode of cavity
-% animate_mode(ELEMs,XYZs,X(1:NDOF*NN),3);
+animate_mode(ELEMs,XYZs,X(1:NDOF*NN),3);
+disp(max(abs(X(1:NDOF*NN))))
+
+animate_mode(ELEMs2,XYZs2,X(NDOF*NN+NNa+1:end),3);
+disp(max(abs(X(NDOF*NN+NNa+1:end))))
+
 return
 %% Static load 
 tol = 1e-6;

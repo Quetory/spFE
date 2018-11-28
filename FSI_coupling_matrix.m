@@ -57,8 +57,10 @@ for Nn = 1: NF
     end
 end
 
+% faces = faces ;
+
 R_s_idx=(NDOF*faces(:,kron(1:NPF,ones(1,NDOF)))-kron(ones(NF,1),kron(ones(1,NPF),(NDOF-1):-1:0))).';
-R_s_idx = R_s_idx(:);
+R_s_idx = R_s_idx(:) + s.off(1); % correct for single pressure dof, length(XYZa)*2 dofs are not present. 
 X = repmat(R_s_idx,1,4).';
 
 %%
@@ -76,7 +78,7 @@ ELEMbf= ELEM(unique(ind),:);
 % show_mesh(ELEMb,XYZf)
 [~, ~, faces] = getsurfacenormals(ELEMbf,XYZf);
 
-R_f_idx=faces + s.off;
+R_f_idx=faces + s.off(2);
 
 Y = repmat(R_f_idx,1,NDOF*NPF).';
 
