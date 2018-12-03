@@ -1,5 +1,14 @@
-function [Kelem,dJ] = ElemAcouStiffness(XYZ, rho,c)
+function [Kelem,dJ] = ElemAcouStiffness(XYZ, mat)
 
+if ~isempty(mat.cs)
+    r_eff = mat.rho_s;
+    rho0 = mat.rho;
+    
+else
+    r_eff = mat.rho;
+    rho0  = mat.rho;
+    
+end
 NPE = size(XYZ,1);
 
 if NPE == 8
@@ -39,7 +48,7 @@ for IN = 1:numel(IP.WT)
     dJ = det(J);
     DNj = J\DN;
     
-    Kelem = Kelem + WT*(DNj.')*DNj*dJ;
+    Kelem = Kelem + 1/r_eff*WT*(DNj.')*DNj*dJ;
 end
 
-% Kelem = Kelem;
+Kelem = rho0*Kelem;

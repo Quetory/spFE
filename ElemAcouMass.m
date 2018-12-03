@@ -1,4 +1,12 @@
-function [Melem] = ElemAcouMass(XYZ,rho,c)
+function [Melem] = ElemAcouMass(XYZ,mat)
+
+if ~isempty(mat.cs)
+    Keff = mat.K_s;
+    rho0=mat.rho;
+else
+    rho0 = mat.rho;
+    Keff  = mat.c^2*mat.rho;
+end
 
 NPE = size(XYZ,1);
 
@@ -37,6 +45,6 @@ for IN = 1:numel(IP.WT)
     J    = DN*XYZ;
     dJ   = det(J);
     
-    Melem = Melem + WT*(N.')*(N)*dJ;
+    Melem = Melem + 1/Keff*WT*(N.')*(N)*dJ;
 end
-Melem = Melem/c^2;
+Melem = rho0*Melem;

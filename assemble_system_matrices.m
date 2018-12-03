@@ -5,12 +5,10 @@ function [M,K] = assemble_system_matrices(ELEM,XYZ, mat, etype)
 xyz = XYZ(ELEM(1,:),:);
 
 if strcmpi(etype,'ACOU')
-    
-    rho = mat.rho;
-    c = mat.c;
 
-    [Melem] = ElemAcouMass(xyz,rho,c);
-    [Kelem] = ElemAcouStiffness(xyz,rho,c);
+    
+    [Melem] = ElemAcouMass(xyz,mat);
+    [Kelem] = ElemAcouStiffness(xyz,mat);
     NDOF = 1;
     
 elseif strcmpi(etype,'STRUCT')
