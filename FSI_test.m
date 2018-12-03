@@ -128,8 +128,8 @@ B(:,[Di; Di2])=[];
 % % [ V,D ] = eigs(-Kf,Mf,10,'sm','Tolerance',1e-24,'MaxIterations',1000,'SubspaceDimension',30);%,'IsCholesky',true,'CholeskyPermutation',s);
 % % [V,D] = eigs_unsym(M2,K2,(2*pi*166)^2,100,8);
 % % [V,D] = eigs_unsym_v2(M2,K2,10,(2*pi*166)^2,50,8);
-% % [V,D,W] = eigs_unsym_v3(B,A,(2*pi*166),80,8);
-% neig = 10;
+% % % [V,D,W] = eigs_unsym_v3(B,A,(2*pi*166),80,8);
+% neig = 20;
 % [W,V,D,resl,resr] = eigs_unsym_v2(A,B,(2*pi*166)^2 , neig);
 % 
 % l = sqrt(D)/2/pi;

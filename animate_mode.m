@@ -88,8 +88,8 @@ elseif size(coordinates,2)==3   %3D object
             caxis([s l]);   
             colormap jet
             colorbar
-            view(3)
-%            view(0,0)
+%             view(3)
+           view(35,-24)
             for t = 1: ceil(Nperiods/freq)
                mode = vanim*sin(2*pi*freq*t);
                P = reshape(mode(faces'),size(faces,2),size(faces,1));

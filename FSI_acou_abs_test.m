@@ -1,4 +1,4 @@
-clear,close all
+clear all
 clc
 %%
 %% Define geometry for structural plate
@@ -20,7 +20,7 @@ mat(1).nu = 0.3;
 
 mat(2).rho   = 1.18; % air
 mat(2).c     = 343;
-mat(2).sigma = 9e3; % flow resistivity Rockwool Flexi A Plate,
+mat(2).sigma = 100; % flow resistivity Rockwool Flexi A Plate,
 mat(2).h     = Lz_a;
 mat(2).cs = [];
 mat(2).K_s = [];
@@ -49,8 +49,8 @@ XYZa(:,3) = XYZa(:,3) + Lz_s;
 ELEM = [ELEMs; ELEMa+NN];
 XYZ  = [XYZs; XYZa];
 %%
-Nf = 500;
-f = logspace(log10(120),log10(400),Nf);
+Nf = 200;
+f = logspace(log10(150),log10(180),Nf);
 
 xi = zeros(NDOF*NN+NNa,1);
 
@@ -59,7 +59,7 @@ X = zeros(NDOF*NN+NNa,Nf);
 
 for ii = 1 : Nf
 
-
+    clear K M
     % Assemble system matrices for acoustic volume
     mat(2) = APM( f(ii), mat(2) );
 
@@ -124,18 +124,24 @@ for ii = 1 : Nf
     clc
     disp(ii)
 end
-return
+
 %%
 DNo(1) = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0);
 DNo(1) = 3*DNo(1); % Z displacement
 
-figure(1)
+fabs4 = f;
+Habs4 = X(DNo,:);
+sigma=100;
+save Transfer_abs4 Habs4 fabs4 X DNo sigma
+
 subplot(211)
 loglog(f, abs(X(DNo,:))/Fload,'.-')
 grid 
+hold all
 subplot(212)
 semilogx(f, angle(X(DNo,:))/pi*180)
 grid 
+hold all
 return
 %% 
 Fidz = d(1)*3;
