@@ -49,8 +49,8 @@ XYZa(:,3) = XYZa(:,3) + Lz_s;
 ELEM = [ELEMs; ELEMa+NN];
 XYZ  = [XYZs; XYZa];
 %%
-Nf = 200;
-f = logspace(log10(150),log10(180),Nf);
+Nf = 130;
+f = logspace(log10(120),log10(190),Nf);
 
 xi = zeros(NDOF*NN+NNa,1);
 
@@ -58,16 +58,20 @@ xi = zeros(NDOF*NN+NNa,1);
 X = zeros(NDOF*NN+NNa,Nf); 
 
 for ii = 1 : Nf
-
-    clear K M
+    w = 2*pi*f(ii);
+    clear K M C
     % Assemble system matrices for acoustic volume
-    mat(2) = APM( f(ii), mat(2) );
-
+    mat(ii) = APM( f(ii), mat(2) );
+    
     [Mf, Kf] = assemble_system_matrices(ELEMa, XYZa, mat(2), 'ACOU');
 
     % Assemble global system matrices
-    M = blkdiag(Ms,Mf);%,Ms2);
-    K = blkdiag(Ks,Kf);%,Ks2);
+%     M = blkdiag(Ms,Mf);%,Ms2);
+%     K = blkdiag(Ks,Kf);%,Ks2);
+    
+    M = blkdiag(Ms, -real(Mf));
+    K = blkdiag(Ks, -real(Kf));
+    
     
     % Create FSI coupling matrix
     DNs = find(XYZs(:,3)==Lz_s);
@@ -76,11 +80,13 @@ for ii = 1 : Nf
     s.tot = size(K,1);
     s.off = [0 length(XYZs)*(NDOF-1)]; % correction for DoFs counting
     [R] = FSI_coupling_matrix(ELEM,XYZ,DNs,DNa,s);
-
+    
     %%
-    M = M + mat(2).rho*R.';
-    K = K - R  ;
-
+%     M = M + R.'; %mat(2).rho_s
+%     K = K - R ;
+    r = R(1:size(Ks,2),size(Ks,2)+1:end);
+    Cf = -w*imag(Mf) + 1/w*imag(Kf);
+    C = [ sparse(size(Ks,1),size(Ks,2)) -r; -r.' Cf] ;
     % Find nodes for fixed support constraint
     % find edges of plate 1
     DN = unique([ find(XYZs(:,2)==0) ; find(XYZs(:,2)==Ly_s) ; find(XYZs(:,1)==0) ; find(XYZs(:,1)==Lx_s)]);
@@ -99,6 +105,8 @@ for ii = 1 : Nf
     B(Di,:)=[];
     B(:,Di)=[];
 
+    C(Di,:)=[];
+    C(:,Di)=[];
     % Static load 
 
     DN = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0 );
@@ -113,8 +121,8 @@ for ii = 1 : Nf
 
     % Harmonic response
 
-    w = 2*pi*f(ii);
-    H = -w^2*B + A ;
+    
+    H = -w^2*B + 1i*w*C + A ;
     [L,U,P,Q,D] = lu(H) ;
     
     y = Q*(U\(L\(P*(D\Fe))));
@@ -124,24 +132,29 @@ for ii = 1 : Nf
     clc
     disp(ii)
 end
-
+return
 %%
 DNo(1) = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0);
 DNo(1) = 3*DNo(1); % Z displacement
 
-fabs4 = f;
-Habs4 = X(DNo,:);
-sigma=100;
-save Transfer_abs4 Habs4 fabs4 X DNo sigma
+fabs = f;
+Habs = X(DNo,:);
+sigma=mat(2).sigma;
+save Transfer_abs_s100 Habs fabs X DNo sigma
 
+Hab = importdata('foo_abs.txt');
+
+figure(1)
 subplot(211)
-loglog(f, abs(X(DNo,:))/Fload,'.-')
+loglog(f, abs(X(DNo,:)),'.-')
 grid 
 hold all
+loglog(Hab(:,1), abs(Hab(:,2)+1i*Hab(:,3)),'.-')
 subplot(212)
 semilogx(f, angle(X(DNo,:))/pi*180)
 grid 
 hold all
+semilogx(Hab(:,1), angle(Hab(:,2)+1i*Hab(:,3))/pi*180,'.-')
 return
 %% 
 Fidz = d(1)*3;

@@ -2,7 +2,7 @@ function [Kelem,dJ] = ElemAcouStiffness(XYZ, mat)
 
 if ~isempty(mat.cs)
     r_eff = mat.rho_s;
-    rho0 = mat.rho;
+    rho0 = 1;%mat.rho;
     
 else
     r_eff = mat.rho;

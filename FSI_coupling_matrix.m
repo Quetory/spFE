@@ -83,4 +83,4 @@ R_f_idx=faces + s.off(2);
 Y = repmat(R_f_idx,1,NDOF*NPF).';
 
 Rfsi = sparse(X(:),Y(:),R(:),s.tot,s.tot);
-
+% Rfsi = sparse(X(:),Y(:),R(:),s.tot,s.tot);
