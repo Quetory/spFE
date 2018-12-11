@@ -2,7 +2,7 @@ function [Melem] = ElemAcouMass(XYZ,mat)
 
 if ~isempty(mat.cs)
     Keff = mat.K_s;
-    rho0= 1;%mat.rho;
+    rho0= mat.rho_s;
 else
     rho0 = mat.rho;
     Keff  = mat.c^2*mat.rho;

@@ -56,21 +56,26 @@ xi = zeros(NDOF*NN+NNa,1);
 
 
 X = zeros(NDOF*NN+NNa,Nf); 
-
+% return
 for ii = 1 : Nf
     w = 2*pi*f(ii);
     clear K M C
     % Assemble system matrices for acoustic volume
-    mat(ii) = APM( f(ii), mat(2) );
+%     mat = APM( f(ii), mat(2) );
+    Z_DB70_Mik90 = 4.9849e+02 - 1.4370e+02i;
+    k_DB70_Mik90 = 3.7646 - 1.4227i;
+    mat(2).K_s   = Z_DB70_Mik90.*f(ii)./k_DB70_Mik90;
+    mat(2).rho_s = k_DB70_Mik90.*Z_DB70_Mik90./f(ii);
+    mat(2).cs  = sqrt(mat(2).K_s./mat(2).rho_s);
     
     [Mf, Kf] = assemble_system_matrices(ELEMa, XYZa, mat(2), 'ACOU');
 
     % Assemble global system matrices
-%     M = blkdiag(Ms,Mf);%,Ms2);
-%     K = blkdiag(Ks,Kf);%,Ks2);
+    M = blkdiag(Ms,Mf);%,Ms2);
+    K = blkdiag(Ks,Kf);%,Ks2);
     
-    M = blkdiag(Ms, -real(Mf));
-    K = blkdiag(Ks, -real(Kf));
+%     M = blkdiag(Ms, -real(Mf));
+%     K = blkdiag(Ks, -real(Kf));
     
     
     % Create FSI coupling matrix
@@ -82,11 +87,11 @@ for ii = 1 : Nf
     [R] = FSI_coupling_matrix(ELEM,XYZ,DNs,DNa,s);
     
     %%
-%     M = M + R.'; %mat(2).rho_s
-%     K = K - R ;
-    r = R(1:size(Ks,2),size(Ks,2)+1:end);
-    Cf = -w*imag(Mf) + 1/w*imag(Kf);
-    C = [ sparse(size(Ks,1),size(Ks,2)) -r; -r.' Cf] ;
+    M = M + mat(2).rho_s*R.'; %mat(2).rho_s
+    K = K - R ;
+%     r = R(1:size(Ks,2),size(Ks,2)+1:end);
+%     Cf = -w*imag(Mf) + 1/w*imag(Kf);
+%     C = [ sparse(size(Ks,1),size(Ks,2)) -r; -r.' Cf] ;
     % Find nodes for fixed support constraint
     % find edges of plate 1
     DN = unique([ find(XYZs(:,2)==0) ; find(XYZs(:,2)==Ly_s) ; find(XYZs(:,1)==0) ; find(XYZs(:,1)==Lx_s)]);
@@ -104,9 +109,9 @@ for ii = 1 : Nf
 
     B(Di,:)=[];
     B(:,Di)=[];
-
-    C(Di,:)=[];
-    C(:,Di)=[];
+% 
+%     C(Di,:)=[];
+%     C(:,Di)=[];
     % Static load 
 
     DN = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0 );
@@ -122,7 +127,7 @@ for ii = 1 : Nf
     % Harmonic response
 
     
-    H = -w^2*B + 1i*w*C + A ;
+    H = -w^2*B + A ;
     [L,U,P,Q,D] = lu(H) ;
     
     y = Q*(U\(L\(P*(D\Fe))));
@@ -132,7 +137,7 @@ for ii = 1 : Nf
     clc
     disp(ii)
 end
-return
+
 %%
 DNo(1) = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0);
 DNo(1) = 3*DNo(1); % Z displacement
@@ -140,10 +145,10 @@ DNo(1) = 3*DNo(1); % Z displacement
 fabs = f;
 Habs = X(DNo,:);
 sigma=mat(2).sigma;
-save Transfer_abs_s100 Habs fabs X DNo sigma
+save Transfer_abs_const Habs fabs X DNo sigma
 
 Hab = importdata('foo_abs.txt');
-
+Hab=importdata('acou_abs_const.txt')
 figure(1)
 subplot(211)
 loglog(f, abs(X(DNo,:)),'.-')
