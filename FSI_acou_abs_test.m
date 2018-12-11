@@ -63,9 +63,9 @@ for ii = 1 : Nf
     % Assemble system matrices for acoustic volume
 %     mat = APM( f(ii), mat(2) );
     Z_DB70_Mik90 = 4.9849e+02 - 1.4370e+02i;
-    k_DB70_Mik90 = 3.7646 - 1.4227i;
-    mat(2).K_s   = Z_DB70_Mik90.*f(ii)./k_DB70_Mik90;
-    mat(2).rho_s = k_DB70_Mik90.*Z_DB70_Mik90./f(ii);
+    k_DB70_Mik90 = (3.7646 - 1.4227i);
+    mat(2).K_s   = Z_DB70_Mik90.*w./k_DB70_Mik90 ;
+    mat(2).rho_s = k_DB70_Mik90.*Z_DB70_Mik90./w;
     mat(2).cs  = sqrt(mat(2).K_s./mat(2).rho_s);
     
     [Mf, Kf] = assemble_system_matrices(ELEMa, XYZa, mat(2), 'ACOU');
@@ -87,7 +87,7 @@ for ii = 1 : Nf
     [R] = FSI_coupling_matrix(ELEM,XYZ,DNs,DNa,s);
     
     %%
-    M = M + mat(2).rho_s*R.'; %mat(2).rho_s
+    M = M + R.'; %mat(2).rho_s
     K = K - R ;
 %     r = R(1:size(Ks,2),size(Ks,2)+1:end);
 %     Cf = -w*imag(Mf) + 1/w*imag(Kf);
@@ -147,8 +147,8 @@ Habs = X(DNo,:);
 sigma=mat(2).sigma;
 save Transfer_abs_const Habs fabs X DNo sigma
 
-Hab = importdata('foo_abs.txt');
-Hab=importdata('acou_abs_const.txt')
+% Hab = importdata('foo_abs.txt');
+Hab=importdata('acou_abs_const.txt');
 figure(1)
 subplot(211)
 loglog(f, abs(X(DNo,:)),'.-')
