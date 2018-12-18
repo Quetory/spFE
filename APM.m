@@ -20,20 +20,17 @@ f_max = 1.00*sigma;
 % Revised expressions of Delany and Bazley model by Miki 
 % (NB: gamma = alpha + j beta = j k )
 
-Z_DB70_Mik90 = rho_0*c_0*( 1 + 5.50*(X*1000).^(-0.632) ...
-                            - 1i*8.43*(X*1000).^(-0.632) ); 
+Z_DB70_Mik90 = rho_0*c_0*( 1i*(1 + 5.50*(X*1000).^(-0.632)) - 8.43*(X*1000).^(-0.632) ); 
 
-k_DB70_Mik90 = omega/c_0 .* (-1i) .* ( 11.41*(X*1000).^(-0.618) ...
-                                      + 1i* (1 + 7.81*(X*1000).^(-0.618) ) );
+k_DB70_Mik90 = omega/c_0*( -1i*(11.41*(X*1000).^(-0.618)) + (1 + 7.81*(X*1000).^(-0.618) ) );
                                   
-k_DB70_Mik90 = omega/c_0 .* ( 11.41*(X*1000).^(-0.618) ...
-                                      + 1i* (1 + 7.81*(X*1000).^(-0.618) ) );
                                   
 mat.K_s   = Z_DB70_Mik90.*omega./k_DB70_Mik90;
-mat.rho_s = k_DB70_Mik90.*Z_DB70_Mik90./omega;
+mat.rho_s = k_DB70_Mik90*Z_DB70_Mik90/omega;
 mat.cs  = sqrt(mat.K_s./mat.rho_s);
 
-assignin('base','mat',mat)
+% mat.rho_s = Z_DB70_Mik90/c_0;
+% mat.cs  = 1./(k_DB70_Mik90/omega);
 %%%%%
 %%%%% Compute sound absorption using the two models 
 %%%%% for a sample of thickness d backed by a rigid 

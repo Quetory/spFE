@@ -1,8 +1,11 @@
 function [Melem] = ElemAcouMass(XYZ,mat)
-
+% (1-ig)/b
 if ~isempty(mat.cs)
     Keff = mat.K_s;
     rho0= 1;
+%     g = imag(Keff)/real(Keff);
+%     Keff = (real(Keff)^2+imag((Keff))^2)/real(Keff);
+%     Keff = Keff/(1-1i*g);
 else
     rho0 = mat.rho;
     Keff  = mat.c^2*mat.rho;
@@ -45,6 +48,6 @@ for IN = 1:numel(IP.WT)
     J    = DN*XYZ;
     dJ   = det(J);
     
-    Melem = Melem + 1/Keff*WT*(N.')*(N)*dJ;
+    Melem = Melem + WT*(N.')*(N)*dJ;%1/Keff*
 end
-Melem = rho0*Melem;
+Melem = rho0/Keff*Melem;

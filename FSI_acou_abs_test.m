@@ -25,6 +25,10 @@ mat(2).h     = Lz_a;
 mat(2).cs = [];
 mat(2).K_s = [];
 mat(2).rho_s = [];
+% mat(2).a00=1.04;        %tortuosity
+% mat(2).p=0.98;
+% mat(2).L = 129e-6;
+% mat(2).Lt= 198e-6;
 
 %%
 [XYZs, ELEMs ] = hex_mesh_3D( [Lx_s Ly_s Lz_s], [Nex Ney Nez], 0);
@@ -59,25 +63,27 @@ X = zeros(NDOF*NN+NNa,Nf);
 % return
 for ii = 1 : Nf
     w = 2*pi*f(ii);
-    clear K M C
+    clear K M 
     % Assemble system matrices for acoustic volume
-%     mat = APM( f(ii), mat(2) );
-    Z_DB70_Mik90 = 4.9849e+02 - 1.4370e+02i;
-    k_DB70_Mik90 = (3.7646 - 1.4227i);
-    mat(2).K_s   = Z_DB70_Mik90.*w./k_DB70_Mik90 ;
-    mat(2).rho_s = k_DB70_Mik90.*Z_DB70_Mik90./w;
-    mat(2).cs  = sqrt(mat(2).K_s./mat(2).rho_s);
+    mat_acou.rho   = 1.18; % air
+    mat_acou.c     = 343;
+    mat_acou.sigma = 100; % flow resistivity Rockwool Flexi A Plate,
+    mat_acou.cs = [];
+    mat_acou.K_s = [];
+    mat_acou.rho_s = [];
     
-    [Mf, Kf] = assemble_system_matrices(ELEMa, XYZa, mat(2), 'ACOU');
+    mat_acou = APM( f(ii), mat_acou );
+
+%     mat(2) = JCA( f(ii), mat(2) );
+%     mat_acou.cs = 343*(0.92+0.098i);
+%     mat_acou.rho_s = 1.18*(1.124-0.203i);
+%     mat_acou.K_s = mat_acou.rho_s*mat_acou.cs^2;
+    [Mf, Kf] = assemble_system_matrices(ELEMa, XYZa, mat_acou, 'ACOU');
 
     % Assemble global system matrices
     M = blkdiag(Ms,Mf);%,Ms2);
     K = blkdiag(Ks,Kf);%,Ks2);
-    
-%     M = blkdiag(Ms, -real(Mf));
-%     K = blkdiag(Ks, -real(Kf));
-    
-    
+       
     % Create FSI coupling matrix
     DNs = find(XYZs(:,3)==Lz_s);
     DNa = find(XYZa(:,3)==Lz_s)+NN;
@@ -91,7 +97,7 @@ for ii = 1 : Nf
     K = K - R ;
 %     r = R(1:size(Ks,2),size(Ks,2)+1:end);
 %     Cf = -w*imag(Mf) + 1/w*imag(Kf);
-%     C = [ sparse(size(Ks,1),size(Ks,2)) -r; -r.' Cf] ;
+%     C = [ sparse(size(Ks,1),size(Ks,2)) -r; -r.' -Cf] ;
     % Find nodes for fixed support constraint
     % find edges of plate 1
     DN = unique([ find(XYZs(:,2)==0) ; find(XYZs(:,2)==Ly_s) ; find(XYZs(:,1)==0) ; find(XYZs(:,1)==Lx_s)]);
@@ -125,17 +131,18 @@ for ii = 1 : Nf
     Fe(Di) = [];
 
     % Harmonic response
-
-    
+   
     H = -w^2*B + A ;
-    [L,U,P,Q,D] = lu(H) ;
-    
-    y = Q*(U\(L\(P*(D\Fe))));
-    
+%     clear L U P Q D
+%     [L,U,P,Q,D] = lu(H) ;
+
+%     y = Q*(U\(L\(P*(D\Fe))));
+    y =H\Fe;
     xi(Di)=1;
     X(~xi,ii)=y;   
     clc
     disp(ii)
+    disp(mat_acou.rho_s)
 end
 
 %%
@@ -145,21 +152,27 @@ DNo(1) = 3*DNo(1); % Z displacement
 fabs = f;
 Habs = X(DNo,:);
 sigma=mat(2).sigma;
-save Transfer_abs_const Habs fabs X DNo sigma
+% save Transfer_abs_s100v4 Habs fabs X DNo sigma
 
 % Hab = importdata('foo_abs.txt');
-Hab=importdata('acou_abs_const.txt');
+% Hab=importdata('acou_abs_const.txt');
+
+%%
+clc
+Hab=importdata('acou_abs_miki.txt');
+
 figure(1)
 subplot(211)
 loglog(f, abs(X(DNo,:)),'.-')
-grid 
 hold all
-loglog(Hab(:,1), abs(Hab(:,2)+1i*Hab(:,3)),'.-')
+loglog(Hab(1:130,1), abs(Hab(1:130,2)+1i*Hab(1:130,3)),'.-')
+
+grid on
 subplot(212)
 semilogx(f, angle(X(DNo,:))/pi*180)
-grid 
 hold all
-semilogx(Hab(:,1), angle(Hab(:,2)+1i*Hab(:,3))/pi*180,'.-')
+semilogx(Hab(1:130,1), angle(Hab(1:130,2)+1i*Hab(1:130,3))/pi*180,'.-')
+grid on
 return
 %% 
 Fidz = d(1)*3;

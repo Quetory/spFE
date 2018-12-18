@@ -1,5 +1,5 @@
 function [Kelem,dJ] = ElemAcouStiffness(XYZ, mat)
-
+%(1+iG)/r
 if ~isempty(mat.cs)
     r_eff = mat.rho_s;
     rho0 = 1;
@@ -48,7 +48,7 @@ for IN = 1:numel(IP.WT)
     dJ = det(J);
     DNj = J\DN;
     
-    Kelem = Kelem + 1/r_eff*WT*(DNj.')*DNj*dJ;
+    Kelem = Kelem + WT*(DNj.')*DNj*dJ;%1/r_eff*
 end
 
-Kelem = rho0*Kelem;
+Kelem = rho0/r_eff*Kelem;

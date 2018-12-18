@@ -36,8 +36,14 @@ K=sparse(X(:),Y(:),Ke(:));
 M=sparse(X(:),Y(:),Me(:));
 
 
+% unsr = 1/2*(real(K).'-real(K));
+% unsi = 1/2*(imag(K).'-imag(K));
 uns = 1/2*(K.'-K);
+
 K = K+uns;
 
 uns = 1/2*(M.'-M);
-M=M+uns;
+% unsr = 1/2*(real(M).'-real(M));
+% unsi = 1/2*(imag(M).'-imag(M));
+
+M = M+uns;
