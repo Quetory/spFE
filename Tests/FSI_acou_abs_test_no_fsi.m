@@ -25,8 +25,8 @@ mat.rho_s = [];
 [NNa,~] = size(XYZ);
 
 %%
-Nf = 400;
-f = logspace(log10(100),log10(700),Nf);
+Nf = 100;
+f = logspace(log10(120),log10(200),Nf);
 
 xi = zeros(NNa,1);
 
@@ -62,7 +62,6 @@ for ii = 1 : Nf
     clear L U P Q D
     [L,U,P,Q,D] = lu(H) ;
     y = Q*(U\(L\(P*(D\Fe))));
-%     y =H\Fe;
 
     X(:,ii)=y;   
     clc
@@ -94,13 +93,13 @@ Hans(3,:)=(Hab(1:end,2)+1i*Hab(1:end,3));
 
 figure(1)
 subplot(211)
-loglog(f, abs(X(DNo,:).*(2*pi*f)./abs([mat_acou.rho_s])))
+loglog(f, abs(X(DNo,:).*(2*pi*1i*f)./abs([mat_acou.rho_s])))
 hold all
 loglog(fa, abs(Hans),'.')
 
 grid on
 subplot(212)
-semilogx(f, angle(X(DNo,:).*(2*pi*f)./abs([mat_acou.rho_s]))/pi*180)
+semilogx(f, angle(X(DNo,:).*(2*pi*1i*f)./abs([mat_acou.rho_s]))/pi*180)
 hold all
 semilogx(fa, angle(Hans)/pi*180,'.')
 grid on

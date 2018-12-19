@@ -8,7 +8,7 @@ Lz_s = .01;
 
 Nex = 16;
 Ney = 16;
-Nez = 1;
+Nez = 1.0;
 
 [XYZs, ELEMs ] = hex_mesh_3D( [Lx_s Ly_s Lz_s], [Nex Ney Nez], 0);
 
@@ -44,8 +44,8 @@ mat(2).cs = [];
 mat(2).K_s = [];
 mat(2).rho_s = [];
 
-f = 1000;
-mat(2) = APM(f,mat(2));
+% f = 1000;
+% mat(2) = APM(f,mat(2));
 
 [Mf, Kf] = assemble_system_matrices(ELEMa, XYZa, mat(2), 'ACOU');
 
@@ -70,7 +70,7 @@ s.off = [0 length(XYZs)*(NDOF-1)]; % correction for DoFs counting
 
 
 %%
-M = M + R.';
+M = M + mat(2).rho*R.';
 K = K - R ;
 
 %% Find nodes for fixed support constraint
@@ -106,8 +106,8 @@ Fe(DN*3) = Fload;
 Fe(Di) = [];
 
 %% Harmonic response
-Nf = 600;
-f = logspace(log10(120),3,Nf);
+Nf = 150;
+f = logspace(log10(150),log10(200),Nf);
 
 xi = zeros(NDOF*NN+NNa,1);
 xi(Di)=1;
@@ -126,34 +126,37 @@ for ii = 1 : Nf
 end
 
 
-%%
-
-% load Transfer_abs
-
+%% Define output node
 DNo(1) = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0);
-
 DNo(1) = 3*DNo(1); % Z displacement
 
-Hn = X(DNo,:);
-fn = f;
+DNo(2) = find(XYZa(:,1)==0.3125 &  XYZa(:,2)==0.9375e-1  & XYZa(:,3)==0.51);
+DNo(2) = 3*NN+DNo(2); % Z displacement
 
+
+Hn = X(DNo,:);
 
 %%
+Hab=importdata('acou_fsi_uz.txt');
 
-load Transfer_noabs.mat
-load Transfer_abs.mat
-load Transfer_abs2.mat
+fa = Hab(:,1);
+Hans(1,:) = (Hab(1:end,2)+1i*Hab(1:end,3));
+
+Hab=importdata('acou_fsi_p.txt');
+Hans(2,:)=(Hab(1:end,2)+1i*Hab(1:end,3));
+
+%%
+close all
 figure(1)
 subplot(211)
 loglog(f, abs(Hn)/Fload)
 hold all
-loglog(fabs, abs(Habs)/Fload)
-loglog(fabs, abs(Habs2)/Fload)
+loglog(fa, abs(Hans)/Fload)
 grid 
 subplot(212)
 semilogx(f, angle(Hn)/pi*180)
 hold all
-semilogx(fabs, angle(Habs)/pi*180)
+semilogx(fa, angle(Hans)/pi*180)
 grid 
 return
 %% 
