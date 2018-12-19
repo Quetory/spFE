@@ -53,15 +53,13 @@ for Nn = 1: NF
             J      = [1 1 1;(DN*XYZs(faces(Nn,:),:))];
         end
         dJ   = det(J);
-        R(:,:,Nn) = R(:,:,Nn) + kron(N.',eye(3))*nf(:,Nn)*N*dJ*WT;
+        R(:,:,Nn) = R(:,:,Nn) + kron(N.',eye(3))*(nf(:,Nn)*N)*dJ*WT;
     end
 end
 
-% faces = faces ;
-
 R_s_idx=(NDOF*faces(:,kron(1:NPF,ones(1,NDOF)))-kron(ones(NF,1),kron(ones(1,NPF),(NDOF-1):-1:0))).';
 R_s_idx = R_s_idx(:) + s.off(1); % correct for single pressure dof, length(XYZa)*2 dofs are not present. 
-X = repmat(R_s_idx,1,4).';
+X = repmat(R_s_idx,1,NPF);
 
 %%
 XYZf = NaN(size(XYZ));
@@ -80,7 +78,7 @@ ELEMbf= ELEM(unique(ind),:);
 
 R_f_idx=faces + s.off(2);
 
-Y = repmat(R_f_idx,1,NDOF*NPF).';
+Y = repmat(R_f_idx,NDOF*NPF,1);
 
 Rfsi = sparse(X(:),Y(:),R(:),s.tot,s.tot);
 % Rfsi = sparse(X(:),Y(:),R(:),s.tot,s.tot);

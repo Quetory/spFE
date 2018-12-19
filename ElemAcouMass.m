@@ -3,9 +3,6 @@ function [Melem] = ElemAcouMass(XYZ,mat)
 if ~isempty(mat.cs)
     Keff = mat.K_s;
     rho0= 1;
-%     g = imag(Keff)/real(Keff);
-%     Keff = (real(Keff)^2+imag((Keff))^2)/real(Keff);
-%     Keff = Keff/(1-1i*g);
 else
     rho0 = mat.rho;
     Keff  = mat.c^2*mat.rho;
