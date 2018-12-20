@@ -29,7 +29,7 @@ else
     M(4:6,10:15) = blkdiag([r*t s*t], [r*s s*t],[r*s r*t]);
     M(1:3,16:21) = blkdiag([r*s r*t],[r*s s*t],[r*t s*t]);
     M(4:6,22:24) = diag([r*s r*t s*t]);
-    M(:,  25:30) = r*s*t*eye(6);
+%     M(:,  25:30) = r*s*t*eye(6);
     
     M = 1/dJ*T*M;
 end

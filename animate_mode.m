@@ -1,5 +1,5 @@
 function animate_mode(elements,coordinates, shape,NDOF)
-Nperiods = 2;
+Nperiods = 0.5;
 freq = 0.025;
 sc   = ones(3,1);
 gain = 0.2;
@@ -42,7 +42,7 @@ elseif size(coordinates,2)==3   %3D object
            colormap jet
            
            Clim = sqrt(sum(vanim_o.^2,2));
-           for t = 1:1% ceil(Nperiods/freq)
+           for t = 1: ceil(Nperiods/freq)
                clf
                mode = coordinates + vanim*cos(2*pi*freq*t);
                Col = vanim_o*cos(2*pi*freq*t);
@@ -58,7 +58,7 @@ elseif size(coordinates,2)==3   %3D object
                zlim(alimits(3,:));
                caxis([min(Clim) max(Clim)]);
                colorbar
-%                view(3)
+               view(3)
                
                grid on
                drawnow;
