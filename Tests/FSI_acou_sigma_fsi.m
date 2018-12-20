@@ -54,7 +54,7 @@ for ii = 1 : Nf
     % Assemble system matrices for acoustic volume
     mat_acou.rho   = 1.18; % air @ T=22 degC
     mat_acou.c     = 343;  % air @ T=22 degC
-    mat_acou.sigma = 100;
+    mat_acou.sigma = 10;
     mat_acou.cs = [];
     mat_acou.K_s = [];
     mat_acou.rho_s = [];
@@ -133,24 +133,36 @@ end
 DNo(1) = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0);
 DNo(1) = 3*DNo(1); % Z displacement
 
-DNo(2) = find(XYZa(:,1)==0.3125 &  XYZa(:,2)==0.9375e-1  & XYZa(:,3)==0.51);
+DNo(2) = find(XYZa(:,1)==0.3125 &  XYZa(:,2)==0.93750e-1  & XYZa(:,3)==0.51);
 DNo(2) = 3*NN+DNo(2); % Z displacement
 
 
 Hn = X(DNo,:);
-save Transfer_acou_damp_fsi Hn DNo DN Fload
+
+save Transfer_sigma_10_fsi Hn DNo DN Fload f
+
+% Import Ansys data
+Hab=importdata('acou_fsi_s10_uz_120_1e3.txt');
+
+fa = Hab(:,1);
+Hans(1,:) = (Hab(1:end,2)+1i*Hab(1:end,3));
+
+Hab=importdata('acou_fsi_s10_p_120_1e3.txt');
+Hans(2,:)=(Hab(1:end,2)+1i*Hab(1:end,3));
+
+
 %% Plot
 close all
 figure(1)
 subplot(211)
-loglog(f, abs(Hn)/Fload)
+loglog(f, abs(Hn(1,:))/Fload)
 hold all
-loglog(fa, abs(Hans)/Fload)
+loglog(fa, abs(Hans(1,:))/Fload)
 grid 
 subplot(212)
-semilogx(f, angle(Hn)/pi*180)
+semilogx(f, angle(Hn(1,:))/pi*180)
 hold all
-semilogx(fa, angle(Hans)/pi*180)
+semilogx(fa, angle(Hans(1,:))/pi*180)
 grid 
 return
 %% 

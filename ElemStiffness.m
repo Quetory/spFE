@@ -59,8 +59,8 @@ end
 if eas
     [T0, dJ0] = EAS_M_transformation(XYZ,[0 0 0]);
     T0 = T0*dJ0;
-    m(2) = 4;
-    m(3) = 11;
+%     m(2) = 4;
+%     m(3) = 11;
     m(3) = 24;
     L = zeros(m(NDOF),NDOF*NPE);
     Q = zeros(m(NDOF));

@@ -25,14 +25,13 @@ mat.rho_s = [];
 [NNa,~] = size(XYZ);
 
 %%
-Nf = 100;
-f = logspace(log10(120),log10(200),Nf);
+Nf =400;
+f = logspace(log10(120),log10(800),Nf);
 
 xi = zeros(NNa,1);
 
-
 X = zeros(NNa,Nf); 
-% return
+
 for ii = 1 : Nf
     w = 2*pi*f(ii);
     clear K M 
@@ -55,7 +54,7 @@ for ii = 1 : Nf
     Fload = 1;
 
     Fe = sparse(size(K,1),1);
-    Fe(DN) = Fload;
+    Fe(DN) = Fload/mat_acou(ii).rho_s;
 
     % Harmonic response
     H = -w^2*M + K ;
@@ -66,7 +65,7 @@ for ii = 1 : Nf
     X(:,ii)=y;   
     clc
     disp(ii)
-    disp(mat_acou(ii).rho_s)
+%     disp(mat_acou(ii).rho_s)
 end
 
 %%
@@ -74,11 +73,13 @@ DNo(1) = find(XYZ(:,1)==Lx_s/2 &  XYZ(:,2)==Ly_s/2  & XYZ(:,3)==1/9);
 DNo(2) = find(XYZ(:,1)==Lx_s/2 &  XYZ(:,2)==Ly_s/2  & XYZ(:,3)==2/9);
 DNo(3) = find(XYZ(:,1)==Lx_s/2 &  XYZ(:,2)==Ly_s/2  & XYZ(:,3)==3/9);
 
+Hn = (X(DNo,:).*(2*pi*1i*f));
 
+save Transfer_sigma_10_no_fsi Hn DNo DN Fload f
 
 %%
 close all
-Hab=importdata('acou_abs_miki_no_fsi_large.txt');
+Hab=importdata('acou_abs_miki_no_fsi_large_1.txt');
 
 fa = Hab(:,1);
 Hans(1,:) = (Hab(1:end,2)+1i*Hab(1:end,3));
@@ -89,19 +90,17 @@ Hans(2,:)=(Hab(1:end,2)+1i*Hab(1:end,3));
 Hab=importdata('acou_abs_miki_no_fsi_large_3.txt');
 Hans(3,:)=(Hab(1:end,2)+1i*Hab(1:end,3));
 
-
-
 figure(1)
 subplot(211)
-loglog(f, abs(X(DNo,:).*(2*pi*1i*f)./abs([mat_acou.rho_s])))
+loglog(f, abs(X(DNo,:).*(2*pi*1i*f)),'linewidth',2)
 hold all
-loglog(fa, abs(Hans),'.')
+loglog(fa, abs(Hans),'o','markersize',4)
 
 grid on
 subplot(212)
-semilogx(f, angle(X(DNo,:).*(2*pi*1i*f)./abs([mat_acou.rho_s]))/pi*180)
+semilogx(f, angle(X(DNo,:).*(2*pi*1i*f))/pi*180,'linewidth',2)
 hold all
-semilogx(fa, angle(Hans)/pi*180,'.')
+semilogx(fa, angle(Hans)/pi*180,'o','markersize',4)
 grid on
 return
 

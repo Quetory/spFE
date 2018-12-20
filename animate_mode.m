@@ -42,10 +42,10 @@ elseif size(coordinates,2)==3   %3D object
            colormap jet
            
            Clim = sqrt(sum(vanim_o.^2,2));
-           for t = 1: ceil(Nperiods/freq)
+           for t = 1:1% ceil(Nperiods/freq)
                clf
-               mode = coordinates + vanim*sin(2*pi*freq*t);
-               Col = vanim_o*sin(2*pi*freq*t);
+               mode = coordinates + vanim*cos(2*pi*freq*t);
+               Col = vanim_o*cos(2*pi*freq*t);
                C = sqrt(sum(Col.^2,2));
                X=reshape(mode(faces',1),size(faces,2),size(faces,1));
                Y=reshape(mode(faces',2),size(faces,2),size(faces,1)); 
@@ -58,7 +58,7 @@ elseif size(coordinates,2)==3   %3D object
                zlim(alimits(3,:));
                caxis([min(Clim) max(Clim)]);
                colorbar
-               view(3)
+%                view(3)
                
                grid on
                drawnow;

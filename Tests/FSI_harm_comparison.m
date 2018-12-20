@@ -92,13 +92,13 @@ A(:,Di)=[];
 B(Di,:)=[];
 B(:,Di)=[];
 
-
+% return
 %% Static load 
 
 DN = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0 );
 nd = length(DN);
 
-Fload = 1e3;
+Fload = 1;
 
 Fe = sparse(size(K,1),1);
 Fe(DN*3) = Fload;
@@ -106,8 +106,8 @@ Fe(DN*3) = Fload;
 Fe(Di) = [];
 
 %% Harmonic response
-Nf = 150;
-f = logspace(log10(150),log10(200),Nf);
+Nf = 100;
+f = logspace(log10(400),log10(500),Nf);
 
 xi = zeros(NDOF*NN+NNa,1);
 xi(Di)=1;
@@ -131,10 +131,12 @@ DNo(1) = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0);
 DNo(1) = 3*DNo(1); % Z displacement
 
 DNo(2) = find(XYZa(:,1)==0.3125 &  XYZa(:,2)==0.9375e-1  & XYZa(:,3)==0.51);
+DNo(2) = find(XYZa(:,1)==0.3 &  XYZa(:,2)==0.1  & XYZa(:,3)==0.51);
 DNo(2) = 3*NN+DNo(2); % Z displacement
 
 
 Hn = X(DNo,:);
+save Transfer_sigma_0_fsi_v2 Hn DNo DN f
 
 %%
 Hab=importdata('acou_fsi_uz.txt');
@@ -149,9 +151,9 @@ Hans(2,:)=(Hab(1:end,2)+1i*Hab(1:end,3));
 close all
 figure(1)
 subplot(211)
-loglog(f, abs(Hn)/Fload)
+loglog(f, abs(Hn)/Fload,'k')
 hold all
-loglog(fa, abs(Hans)/Fload)
+loglog(fa, abs(Hans))
 grid 
 subplot(212)
 semilogx(f, angle(Hn)/pi*180)
