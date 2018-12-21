@@ -6,8 +6,8 @@ Lx_s = 0.5;
 Ly_s = 0.5;
 Lz_s = .01;
 
-Nex = 16;
-Ney = 16;
+Nex = 32;
+Ney = 32;
 Nez = 1.0;
 
 [XYZs, ELEMs ] = hex_mesh_3D( [Lx_s Ly_s Lz_s], [Nex Ney Nez], 0);
@@ -92,7 +92,7 @@ A(:,Di)=[];
 B(Di,:)=[];
 B(:,Di)=[];
 
-% return
+return
 %% Static load 
 
 DN = find(XYZs(:,1)==Lx_s/2 &  XYZs(:,2)==Ly_s/2  & XYZs(:,3)==0 );

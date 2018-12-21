@@ -1,5 +1,6 @@
 clear all
 clc
+tic
 %%
 %% Define geometry for structural plate
 Lx_s = 0.5;
@@ -54,7 +55,7 @@ for ii = 1 : Nf
     % Assemble system matrices for acoustic volume
     mat_acou.rho   = 1.18; % air @ T=22 degC
     mat_acou.c     = 343;  % air @ T=22 degC
-    mat_acou.sigma = 10;
+    mat_acou.sigma = 1000;
     mat_acou.cs = [];
     mat_acou.K_s = [];
     mat_acou.rho_s = [];
@@ -138,7 +139,8 @@ DNo(2) = 3*NN+DNo(2); % Z displacement
 
 
 Hn = X(DNo,:);
-
+toc
+return
 save Transfer_sigma_10_fsi Hn DNo DN Fload f
 
 % Import Ansys data
