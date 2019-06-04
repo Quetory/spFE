@@ -1,6 +1,6 @@
 function [Kelem,dJ] = ElemAcouStiffness(XYZ, mat)
 %(1+iG)/r
-if ~isempty(mat.cs)
+if isfield(mat,'cs') && ~isempty(mat.cs)
     r_eff = mat.rho_s;
     rho0 = 1;
     

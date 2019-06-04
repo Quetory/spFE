@@ -14,6 +14,10 @@ function [Rfsi] = FSI_coupling_matrix(ELEM, XYZ, NNs, NNf, s)
 XYZs = NaN(size(XYZ));
 XYZs(NNs,:) = XYZ(NNs,:);
 
+XYZf = NaN(size(XYZ));
+XYZf(NNf,:) = XYZ(NNf,:);
+
+% structural part
 NDOF = size(XYZs,2);
 nd = length(NNs);
 
@@ -23,13 +27,33 @@ for ii = 1:length(en)
     [i,~]=ind2sub(size(ELEM),en{ii});  
     ind = [ind ;i];
 end
+struc_elem = unique(ind);
 
-ELEMb = ELEM(unique(ind),:);
-% show_mesh(ELEMb,XYZf)
+ELEMb = ELEM(struc_elem,:);
+
 [n, ~, faces] = getsurfacenormals(ELEMb,XYZs);
 
-% Fluid normal is opposite of structural normal
-nf = -n.';
+
+% fluid part
+en = arrayfun(@(i) find(ELEM - NNf(i)==0),1:nd,'UniformOutput',false);
+ind = [];
+for ii = 1:length(en)
+    [i,~]=ind2sub(size(ELEM),en{ii});  
+    ind = [ind ;i];
+end
+
+fluid_elem = unique(ind);
+ELEMbf= ELEM(fluid_elem,:);
+
+
+% Get correct normal for FSI, i.e. from structural side towards fluid side
+n_dir = (mean(XYZ(ELEM(struc_elem,:),:))-mean(XYZ(ELEM(fluid_elem,:),:)))*n.';
+
+if n_dir>0
+    nf = n.';
+else
+    nf = -n.';
+end
 
 [NF,NPF] = size(faces);
 
@@ -62,19 +86,11 @@ R_s_idx = R_s_idx(:) + s.off(1); % correct for single pressure dof, length(XYZa)
 X = repmat(R_s_idx,1,NPF);
 
 %%
-XYZf = NaN(size(XYZ));
-XYZf(NNf,:) = XYZ(NNf,:);
 
-en = arrayfun(@(i) find(ELEM - NNf(i)==0),1:nd,'UniformOutput',false);
-ind = [];
-for ii = 1:length(en)
-    [i,~]=ind2sub(size(ELEM),en{ii});  
-    ind = [ind ;i];
-end
 
-ELEMbf= ELEM(unique(ind),:);
-% show_mesh(ELEMb,XYZf)
-[~, ~, faces] = getsurfacenormals(ELEMbf,XYZf);
+
+% show_mesh(ELEMbf,XYZf)
+[~, ~ , faces] = getsurfacenormals(ELEMbf,XYZf);
 
 R_f_idx=faces + s.off(2);
 

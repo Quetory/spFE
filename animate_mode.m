@@ -1,5 +1,5 @@
 function animate_mode(elements,coordinates, shape,NDOF)
-Nperiods = 0.5;
+Nperiods = 2;
 freq = 0.025;
 sc   = ones(3,1);
 gain = 0.2;
@@ -79,7 +79,7 @@ elseif size(coordinates,2)==3   %3D object
             Y=reshape(coordinates(faces',2),size(faces,2),size(faces,1)); 
             Z = reshape(coordinates(faces',3),size(faces,2),size(faces,1));
             P = zeros(size(Z));
-            h = patch(X,Y,Z,P,'EdgeColor','interp' );
+            h = patch(X,Y,Z,P);%,'EdgeColor','interp' );
 %             set(gcf,'position',[680   208   851   770]);
             axis equal
             xlim(alimits(1,:));
@@ -89,7 +89,7 @@ elseif size(coordinates,2)==3   %3D object
             colormap jet
             colorbar
 %             view(3)
-           view(35,-24)
+            view(35,-24)
             for t = 1: ceil(Nperiods/freq)
                mode = vanim*sin(2*pi*freq*t);
                P = reshape(mode(faces'),size(faces,2),size(faces,1));

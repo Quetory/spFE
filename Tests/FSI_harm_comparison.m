@@ -6,8 +6,8 @@ Lx_s = 0.5;
 Ly_s = 0.5;
 Lz_s = .01;
 
-Nex = 32;
-Ney = 32;
+Nex = 24;
+Ney = 24;
 Nez = 1.0;
 
 [XYZs, ELEMs ] = hex_mesh_3D( [Lx_s Ly_s Lz_s], [Nex Ney Nez], 0);
@@ -25,7 +25,7 @@ mat(1).nu = 0.3;
 %% Define geometry for acoustic volume
 Lz_a = 1;
 
-Nez = 18;
+Nez = 24;
 
 [XYZa, ELEMa ] = hex_mesh_3D( [Lx_s Ly_s Lz_a], [Nex Ney Nez], 0);
 

@@ -57,6 +57,6 @@ K21 = K(9:end,1:8);
 K22 = K(9:end,9:end);
 
 x = K22\(-K21*D(:));
-disp(x)
+disp( [ D(:,1:2) reshape(x,2,[])  D(:,3:4) ].' )
 
  

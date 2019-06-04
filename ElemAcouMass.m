@@ -1,6 +1,6 @@
 function [Melem] = ElemAcouMass(XYZ,mat)
 % (1-ig)/b
-if ~isempty(mat.cs)
+if isfield(mat,'cs') && ~isempty(mat.cs)
     Keff = mat.K_s;
     rho0= 1;
 else
