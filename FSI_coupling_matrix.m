@@ -47,7 +47,7 @@ ELEMbf= ELEM(fluid_elem,:);
 
 
 % Get correct normal for FSI, i.e. from structural side towards fluid side
-n_dir = (mean(XYZ(ELEM(struc_elem,:),:))-mean(XYZ(ELEM(fluid_elem,:),:)))*n.';
+n_dir = (mean(XYZ(ELEM(struc_elem,:),:))-mean(XYZ(ELEM(fluid_elem,:),:)))*n(1,:).';
 
 if n_dir>0
     nf = n.';
@@ -65,6 +65,7 @@ if NPF == 4
     IP.WT = ones(1,4);
 end
 
+% R : Pressure from fluid nodes to structural 3-DoF forces
 
 R = zeros(NPF*NDOF,NPF, NF);
 
@@ -81,20 +82,31 @@ for Nn = 1: NF
     end
 end
 
-R_s_idx=(NDOF*faces(:,kron(1:NPF,ones(1,NDOF)))-kron(ones(NF,1),kron(ones(1,NPF),(NDOF-1):-1:0))).';
-R_s_idx = R_s_idx(:) + s.off(1); % correct for single pressure dof, length(XYZa)*2 dofs are not present. 
-X = repmat(R_s_idx,1,NPF);
+% Ordering for X rows, Y colums and R forces
+% % Face 1 nodes: 
+% 4x3 Uxyz - p1
+% 4x3 Uxyz - p2
+% 4x3 Uxyz - p3
+% 4x3 Uxyz - p4
+% Face 2 nodes: 
+% 4x3 Uxyz - p1
+% 4x3 Uxyz - p2
+% 4x3 Uxyz - p3
+% 4x3 Uxyz - p4
+
+R_s_idx=repmat(NDOF*faces(:,kron(1:NPF,ones(1,NDOF)))-kron(ones(NF,1),kron(ones(1,NPF),(NDOF-1):-1:0)),1,4).';
+% R_s_idx = R_s_idx(:) + s.off(1); % correct for single pressure dof, length(XYZa)*2 dofs are not present. 
+X =R_s_idx(:) + s.off(1);
+% X = repmat(R_s_idx,1,NPF);
 
 %%
-
-
-
-% show_mesh(ELEMbf,XYZf)
 [~, ~ , faces] = getsurfacenormals(ELEMbf,XYZf);
 
 R_f_idx=faces + s.off(2);
+Y = R_f_idx(:,kron(1:NPF,ones(1,NPF*NDOF))).';
+% Y = repmat(R_f_idx,NDOF*NPF,1);
 
-Y = repmat(R_f_idx,NDOF*NPF,1);
 
 Rfsi = sparse(X(:),Y(:),R(:),s.tot,s.tot);
+
 % Rfsi = sparse(X(:),Y(:),R(:),s.tot,s.tot);

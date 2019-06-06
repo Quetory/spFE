@@ -88,14 +88,14 @@ for IN = 1:numel(IP.WT)
         
     elseif NPE == 8 && ~eas
         [~,DN] = shape3D8(XI);
-        [B,dJ] = StrainDispMatrix(DN,XYZ);
-%         [Bans,dJ] = ANS_interpolation(DN,XI,XYZ);
-%         [Ti,~] = EAS_M_transformation(XYZ,XI);
-%         B= Ti*Bans;
+%         [B,dJ] = StrainDispMatrix(DN,XYZ);
+        [Bans,dJ] = ANS_interpolation(DN,XI,XYZ);
+        [Ti,~] = EAS_M_transformation(XYZ,XI);
+        B= Ti*Bans;
         
     elseif NPE == 8 && eas
         [~,DN] = shape3D8(XI);
-%         [B1,dJ] = StrainDispMatrix(DN,XYZ);
+%         [B,dJ] = StrainDispMatrix(DN,XYZ);
         [Bans,dJ] = ANS_interpolation(DN,XI,XYZ);
         [Ti,~] = EAS_M_transformation(XYZ,XI);
         B= Ti*Bans;

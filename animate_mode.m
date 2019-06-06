@@ -59,6 +59,7 @@ elseif size(coordinates,2)==3   %3D object
                caxis([min(Clim) max(Clim)]);
                colorbar
                view(3)
+%                view(0,90)
                
                grid on
                drawnow;
@@ -89,7 +90,7 @@ elseif size(coordinates,2)==3   %3D object
             colormap jet
             colorbar
 %             view(3)
-            view(35,-24)
+            view(58,22)
             for t = 1: ceil(Nperiods/freq)
                mode = vanim*sin(2*pi*freq*t);
                P = reshape(mode(faces'),size(faces,2),size(faces,1));

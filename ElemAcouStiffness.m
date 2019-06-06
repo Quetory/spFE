@@ -51,4 +51,4 @@ for IN = 1:numel(IP.WT)
     Kelem = Kelem + WT*(DNj.')*DNj*dJ;%1/r_eff*
 end
 
-Kelem = rho0/r_eff*Kelem;
+Kelem = 1/r_eff*Kelem;%rho0

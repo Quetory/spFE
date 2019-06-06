@@ -4,7 +4,7 @@ if isfield(mat,'cs') && ~isempty(mat.cs)
     Keff = mat.K_s;
     rho0= 1;
 else
-    rho0 = mat.rho;
+    rho0 = 1;%mat.rho;
     Keff  = mat.c^2*mat.rho;
 end
 
