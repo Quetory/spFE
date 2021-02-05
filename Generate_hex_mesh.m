@@ -1,21 +1,27 @@
 clear,close all
 clc
 %%
-Lx = 1;
+Lx = 0.5;
 Ly = 1;
-Lz = .4;
+Lz = 3;
 
-Nex = 10;
-Ney = 10;
-Nez = 6;
+Nex = 1;
+Ney = 1;
+Nez = 1;
 
 [XYZ, ELEM ] = hex_mesh_3D( [Lx Ly Lz], [Nex Ney Nez], 1);
 
+R = @(a) [cosd(a) 0 sind(a); 0 1 0; -sind(a) 0 cosd(a) ];
+
+XYZ = (R(15).'*(XYZ*R(15)).').';
 %% Assemble system matrices
 mat.rho = 1.184;
 mat.c = 346.13;
 
-[M, K] = assemble_system_matrices(ELEM, XYZ, mat, 'ACOU');
+mat.E = 1;
+mat.nu = 0.25;
+
+[M, K] = assemble_system_matrices(ELEM, XYZ, mat, 'STRUCT');
 
 
 %%

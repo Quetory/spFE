@@ -15,6 +15,8 @@ if NPE == 4
     B(3,2:2:2*NPE) = DNj(1,:);
     
 elseif NPE == 8
+    % e = (e11 e22 e33 e12 e23 e13 ) 
+    
     B(1,1:3:3*NPE) = DNj(1,:);
     B(2,2:3:3*NPE) = DNj(2,:);
     B(3,3:3:3*NPE) = DNj(3,:);

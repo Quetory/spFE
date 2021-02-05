@@ -20,12 +20,12 @@ elseif NPE == 20
     IP.XI = [  -p1  p1  p1 -p1 -p1  p1  p1 -p1  p3  p3 p2  p3 -p2  p3;... 
                 -p1 -p1  p1  p1 -p1 -p1  p1  p1  p3 -p2 p3  p2  p3  p3;...
                 -p1 -p1 -p1 -p1  p1  p1  p1  p1 -p2  p3 p3  p3  p3  p2].';
-elseif NPE == 20  % 3-gauss point quadrature
-    C = unique(nchoosek(repmat([1 2 3], 1,3), 3), 'rows');
-    p = [-sqrt(3/5) 0 sqrt(3/5)];
-    w = [5 8 5]/9;    
-    IP.XI = p(C);
-    IP.WT = prod(w(C),2);
+% elseif NPE == 20  % 3-gauss point quadrature
+%     C = unique(nchoosek(repmat([1 2 3], 1,3), 3), 'rows');
+%     p = [-sqrt(3/5) 0 sqrt(3/5)];
+%     w = [5 8 5]/9;    
+%     IP.XI = p(C);
+%     IP.WT = prod(w(C),2);
 end
 
 Melem = zeros(NPE,NPE);

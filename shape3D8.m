@@ -1,5 +1,5 @@
 function [N,DN] = shape3D8 (XI)
-
+% (1,2,3) = (s,t,r)
 N = zeros(1,8);
 DN = zeros(3,8);
 

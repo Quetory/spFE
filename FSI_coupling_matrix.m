@@ -95,18 +95,14 @@ end
 % 4x3 Uxyz - p4
 
 R_s_idx=repmat(NDOF*faces(:,kron(1:NPF,ones(1,NDOF)))-kron(ones(NF,1),kron(ones(1,NPF),(NDOF-1):-1:0)),1,4).';
-% R_s_idx = R_s_idx(:) + s.off(1); % correct for single pressure dof, length(XYZa)*2 dofs are not present. 
+
 X =R_s_idx(:) + s.off(1);
-% X = repmat(R_s_idx,1,NPF);
+
 
 %%
 [~, ~ , faces] = getsurfacenormals(ELEMbf,XYZf);
 
 R_f_idx=faces + s.off(2);
 Y = R_f_idx(:,kron(1:NPF,ones(1,NPF*NDOF))).';
-% Y = repmat(R_f_idx,NDOF*NPF,1);
-
 
 Rfsi = sparse(X(:),Y(:),R(:),s.tot,s.tot);
-
-% Rfsi = sparse(X(:),Y(:),R(:),s.tot,s.tot);

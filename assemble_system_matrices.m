@@ -16,7 +16,7 @@ elseif strcmpi(etype,'STRUCT')
     E = mat.E;
     nu = mat.nu;
     
-    eas = 1;
+    eas = 0;
     [Melem] = ElemMass(xyz,rho);
     [Kelem] = ElemStiffness(xyz,E,nu,eas);
     NDOF = 3;

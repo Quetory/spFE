@@ -56,11 +56,11 @@ elseif size(coordinates,2)==3   %3D object
                xlim(alimits(1,:));
                ylim(alimits(2,:));
                zlim(alimits(3,:));
-               caxis([min(Clim) max(Clim)]);
+               caxis([min(Clim(:)) max(Clim(:))]);
                colorbar
                view(3)
-%                view(0,90)
-               
+% %                view(0,90)
+%                view([90 0])
                grid on
                drawnow;
            end

@@ -10,7 +10,7 @@ Nex = 10;
 Ney = 1;
 Nez = 30;
 
-[XYZ, ELEM ] = hex_mesh_3D( [Lx Ly Lz], [Nex Ney Nez], 0);
+[XYZ, ELEM ] = hex_mesh_3D( [Lx Ly Lz], [Nex Ney Nez], 1);
 
 [NN,NDOF] = size(XYZ);
 
@@ -63,19 +63,19 @@ tol = 1e-6;
 DN = find(XYZ(:,3)== Lz & XYZ(:,1)==Lx );
 nd = length(DN);
 
-Fload = 100;
+Fload = 10;
 Pload = 2;
 
 % [Fe, nF, faces] = apply_pressure(ELEM, XYZ, DN, Pload, [0;1;0]);
 % Fe2 = Fe;
 % Fe2(Di,:)=[];
 
-Fe = sparse(3*DN-2,1,-Fload/2,size(K,1),1);
+Fe = sparse(3*DN-1,1,Fload/2,size(K,1),1);
 
 DN = find(XYZ(:,3)== Lz & XYZ(:,1)==0 );
 nd = length(DN);
 
-Fe2 = sparse(3*DN,1,-Fload/2,size(K,1),1);
+Fe2 = sparse(3*DN-1,1,Fload/2,size(K,1),1);
 Fe2 = Fe+Fe2;
 % Fe2 = Fe;
 Fe2(Di,:)=[];
